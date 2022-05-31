@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг»
 
 * Студент: [Сергей Толмачев](https://up.htmlacademy.ru/javascript/26/user/1911615).
-* Наставник: `Неизвестно`.
+* Наставник: [Антон Попов](https://htmlacademy.ru/profile/joker).
 
 ---
 
