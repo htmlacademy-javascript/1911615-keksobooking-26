@@ -12,6 +12,12 @@ const typesDictionary = {
 const mapCanvas = document.querySelector('#map-canvas');
 const currentObject = randomObjects[getRandomNumber(0,randomObjects.length-1)];
 
+/**
+  * Создает DOM Элемент с храктеристиками объекта для сдачи.
+  * @constructor
+  * @param {Object} объект объявления.
+  * @return {HTMLElement} — карточка объявления на основе объекта.
+*/
 const createCard = (cardData) => {
   const cardTemplate = document.querySelector('#card')
     .content
