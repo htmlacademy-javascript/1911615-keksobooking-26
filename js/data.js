@@ -166,4 +166,5 @@ const createObject = (index) => {
 */
 const generateObjects = () => Array.from({length: OBJECTS_COUNT}, (x, i) => createObject(i));
 
-export {generateObjects};
+const randomObjects = generateObjects();
+export {randomObjects};
