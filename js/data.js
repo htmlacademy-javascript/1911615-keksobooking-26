@@ -62,16 +62,16 @@ const FEATURES_LIST = [
   * @type {string[]}
 */
 const DESCRIPTIONS = [
-  'Aparthotel is located in the very centre of Krakóws Old Town, just 1-minute walk from the Main Market Square. ',
-  'Our beautiful building, in the 30s, today is cultural heritage of the city of Rio de Janeiro. Fully renovated through a retrofit.',
-  'Luxury Apartments are family run complex. we try to give our best so our guests can experiance great service.',
-  'Situated in London, hotel features garden views and free WiFi, 1.1 km from Madame Tussauds and 1.6 km from Lord\'s Cricket Ground. ',
-  'The hotel is an official "casa particular" for tourists.  It\'s ubicated in the center of Habana Vieja; just 10 meters from Obispo street and 200 meters from the "Floridita".',
-  'Spectacular home in downtown Havana, where your comfort will be guaranteed.',
-  'It is an Art Deco house built in 1929 of high struts, with ceilings of 4.80 meters high, with a beautiful entrance with original relief mosaics and a marble staircase that leads to the upper floor.',
-  'Small family tourist lodge located 2 km from the center of Santiago de Compostela, in a quiet and easily accessible neighborhood. Comfortable and nice facilities. ',
-  'The house is located in the beautiful Vedado neighborhood, close to cultural centers, shops and Avenue 23, which facilitates the transport.',
-  'We offer triples,doubles and twins rooms in our home, a beautiful 200 meter square completely restored Casa Colonial from 1883.Our House is an authentic colonial style house dating back from 1883 with more than 5 meter high wooden ceilings.',
+  'Апарт-отель расположен в самом центре Старого города Кракова, всего в 1 минуте ходьбы от Главной Рыночной площади.',
+  'Наше красивое здание, построенное в 30-х годах, сегодня является культурным наследием города Рио-де-Жанейро. Полностью отремонтирован с помощью модернизации.',
+  'Роскошные апартаменты - это семейный комплекс. мы стараемся сделать все возможное, чтобы наши гости могли насладиться отличным сервисом.',
+  'Отель с видом на сад и бесплатным Wi-Fi расположен в Лондоне, в 1,1 км от Музея Мадам Тюссо и в 1,6 км от крикетного поля Лорда. ',
+  'Отель является официальным "особенным домом" для туристов. Он расположен в центре Гавана-Вьеха; всего в 10 метрах от улицы Обиспо и в 200 метрах от "Флоридита".',
+  'Впечатляющий дом в центре Гаваны, где ваш комфорт будет гарантирован.',
+  'Это дом в стиле ар-деко, построенный в 1929 году из высоких стоек, с потолки высотой 4,80 метра, с красивым входом с оригинальной рельефной мозаикой и мраморной лестницей, ведущей на верхний этаж.',
+  'Небольшой семейный туристический коттедж, расположенный в 2 км от центра Сантьяго-де-Компостела, в тихом и легкодоступном районе. Удобные и приятные удобства. ',
+  'Дом расположен в красивом районе Ведадо, недалеко от культурных центров, магазинов и проспекта 23, что облегчает транспорт.',
+  'Мы предлагаем трехместные, двухместные и двухместные номера в нашем доме, красивом 200-метровом полностью отреставрированном колониальном доме 1883 года постройки.Наш дом представляет собой аутентичный дом в колониальном стиле, построенный в 1883 году, с деревянными потолками высотой более 5 метров.',
 ];
 
 /**
@@ -166,4 +166,5 @@ const createObject = (index) => {
 */
 const generateObjects = () => Array.from({length: OBJECTS_COUNT}, (x, i) => createObject(i));
 
-export {generateObjects};
+const randomObjects = generateObjects();
+export {randomObjects};

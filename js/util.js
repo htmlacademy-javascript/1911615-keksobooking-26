@@ -51,7 +51,7 @@ function shuffle(arr){
   * @returns {array} Случайный массив
 */
 function getRandomArray(arr) {
-  return shuffle(arr).slice(0, getRandomNumber(1,arr.length-1));
+  return shuffle(arr).slice(0, getRandomNumber(1,arr.length));
 }
 
 export {getRandomNumber, shuffle, getRandomArray};
