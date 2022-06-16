@@ -5,7 +5,7 @@ const mapFiltersElements = mapFilters.children;
 
 const toggleDisabledElements = (arrayOfElements) => {
   for (const element of arrayOfElements) {
-    element.disabled = element.disabled !== false;
+    element.disabled = !element.disabled;
   }
 };
 

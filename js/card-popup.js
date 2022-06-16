@@ -1,6 +1,3 @@
-import {getRandomNumber} from './util.js';
-import {randomObjects} from './data.js';
-
 const typesDictionary = {
   PALACE: 'Дворец',
   FLAT: 'Квартира',
@@ -8,9 +5,6 @@ const typesDictionary = {
   BUNGALOW: 'Бунгало',
   HOTEL: 'Отель',
 };
-
-const mapCanvas = document.querySelector('#map-canvas');
-const currentObject = randomObjects[getRandomNumber(0,randomObjects.length-1)];
 
 /**
   * Создает DOM Элемент с храктеристиками объекта для сдачи.
@@ -75,4 +69,4 @@ const createCard = (cardData) => {
   return cardElement;
 };
 
-mapCanvas.appendChild(createCard(currentObject));
+export {createCard};
