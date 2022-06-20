@@ -54,4 +54,7 @@ function getRandomArray(arr) {
   return shuffle(arr).slice(0, getRandomNumber(1,arr.length));
 }
 
-export {getRandomNumber, shuffle, getRandomArray};
+const isEscapeKey = (evt) => evt.key === 'Escape';
+const isEnterKey = (evt) => evt.key === 'Enter';
+
+export {getRandomNumber, shuffle, getRandomArray, isEnterKey, isEscapeKey};
