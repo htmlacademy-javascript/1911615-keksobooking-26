@@ -1,60 +1,76 @@
-
 /**
-  * Функция, возвращающая случайное целое число из переданного диапазона включительно.
-  * @param {number} a - Первое число
-  * @param {number} b - Второе число
-*/
-
-function getRandomInteger(a, b) {
-  const min = Math.ceil(Math.min(Math.abs(a), Math.abs(b)));
-  const max = Math.floor(Math.max(Math.abs(a), Math.abs(b)));
-  const RandomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
-  return RandomInteger;
-}
-
-/**
-  * Функция, возвращающая случайное число с указанной точностью из переданного диапазона включительно.
-  * @param {number} a - Первое число
-  * @param {number} b - Второе число
-  * @param {number} [decimals] - Количество знаков после запятой. Необязательный, 0 по умолчанию.
-*/
-
-function getRandomNumber(a, b, decimals = 0) {
-  const multiplier = Math.pow(10,decimals);
-  const min = Math.ceil(Math.min(Math.abs(a), Math.abs(b)));
-  const max = Math.floor(Math.max(Math.abs(a), Math.abs(b)));
-  if (decimals === 0) {
-    return getRandomInteger(min, max);
+ * Вернет случайное число в диапазоне `min`, `max`.
+ * @param {number} min Положительное число.
+ * @param {number} max Положительное число, большее или равное `min`.
+ * @param {number} decimals Максимальное количество знаков после запятой.
+ */
+export function getNumberInRange(min, max, decimals = 5) {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) {
+    throw new RangeError(`Диапазон не является числовым (${typeof min}: ${min}, ${typeof max}: ${max}) `);
   }
-  const RandomInteger = Math.floor(Math.random() * (Math.floor(max*multiplier) - Math.ceil(min*multiplier) + 1)) + Math.ceil(min*multiplier);
-  const RandomFloat = Math.trunc(RandomInteger) / multiplier;
-  return RandomFloat;
+  if (min < 0 || max < 0 || min > max) {
+    throw new RangeError(`Неподдерживаемый диапазон: ${min}, ${max}`);
+  }
+  const value = (max - min) * Math.random() + min;
+  return Number(value.toFixed(decimals));
 }
 
 /**
-  * Функция, перемешивающая элементы диапазона на основании алгоритма Фишера-Йетса.
-  * @param {array} arr - Массив для перемешивания
-  * @returns {array} Перемешанный массив
-*/
-function shuffle(arr){
+ * Вернет случайное целое число в диапазоне `min`, `max`.
+ * @param {number} min Целое положительное число.
+ * @param {number} max Целое положительное число, большее или равное `min`.
+ */
+export function getIntegerInRange(min, max) {
+  if (!Number.isInteger(min) || !Number.isInteger(max)) {
+    throw new RangeError(`Диапазон не является целочисленным (${typeof min}: ${min}, ${typeof max}: ${max}) `);
+  }
+  return getNumberInRange(min, max, 0);
+}
+
+/**
+ * Вернет случайный элемент массива `array`.
+ * @param {array} array Массив элементов.
+ */
+export function getElementInArray(array) {
+  if (!Array.isArray(array) || !array.length) {
+    throw new TypeError(`Аргумент не является массивом: (${typeof array}: ${array}`);
+  }
+  return array[getIntegerInRange(0, array.length-1)];
+}
+
+// console.log(getElementInArray(1));
+// console.log(getElementInArray([]));
+// console.log(getElementInArray([1]));
+// console.log(getElementInArray([1, 2]));
+
+/**
+ * Функция, перемешивающая элементы диапазона на основании алгоритма Фишера-Йетса.
+ * @param {array} arr - Массив для перемешивания
+ * @returns {array} Перемешанный массив
+ */
+export function shuffle(arr) {
   let j;
-  for(let i = arr.length - 1; i > 0; i--){
-    j = Math.floor(Math.random()*(i + 1));
+  for (let i = arr.length - 1; i > 0; i--) {
+    j = Math.floor(Math.random() * (i + 1));
     [arr[i], arr[j]] = [arr[j], arr[i]];
   }
   return arr;
 }
 
 /**
-  * Функция, выдающая массив из случайного числа случайных неповторяющихся элементов массива.
-  * @param {array} arr - Исходный массив
-  * @returns {array} Случайный массив
-*/
-function getRandomArray(arr) {
-  return shuffle(arr).slice(0, getRandomNumber(1,arr.length));
+ * Функция, выдающая массив из случайного числа случайных неповторяющихся элементов массива.
+ * @param {array} arr - Исходный массив
+ * @returns {array} Случайный массив
+ */
+export function getRandomArray(arr) {
+  return shuffle(arr).slice(0, getNumberInRange(1, arr.length));
 }
 
-const isEscapeKey = (evt) => evt.key === 'Escape';
-const isEnterKey = (evt) => evt.key === 'Enter';
+export function isEscapeKey (evt) {
+  return evt.key === 'Escape';
+}
 
-export {getRandomNumber, shuffle, getRandomArray, isEnterKey, isEscapeKey};
+export function isEnterKey(evt) {
+  return evt.key === 'Enter';
+}
+
