@@ -1,4 +1,5 @@
 import {isEscapeKey, isEnterKey} from './util.js';
+import { typesDictionary } from './card-popup.js';
 
 const adForm = document.querySelector('.ad-form');
 const adFormElements = adForm.children;
@@ -74,6 +75,39 @@ function validateTittle (value) {
 }
 
 pristine.addValidator(adForm.querySelector('#title'), validateTittle,'От 2 до 50 символов');
+
+
+
+
+const priceField = adForm.querySelector('#price')
+const typeField = adForm.querySelector('[name="type"]');
+const minPriceDictionary = {
+  palace: 10000,
+  flat: 1000,
+  house: 5000,
+  bungalow: 0,
+  hotel: 3000,
+};
+
+function validatePrice () {
+  return minPriceDictionary[typeField.value] <= priceField.value;
+}
+
+function getPriceErrorMessage () {
+  return `
+  Цена номера типа ${typesDictionary[typeField.value]} должна быть не менее ${minPriceDictionary[typeField.value]} руб.
+  `;
+}
+pristine.addValidator(priceField, validatePrice, getPriceErrorMessage);
+
+function onTypeChange () {
+  priceField.placeholder = minPriceDictionary[typeField.value];
+  pristine.validate(priceField,);
+}
+
+typeField.addEventListener('change', onTypeChange);
+
+
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();

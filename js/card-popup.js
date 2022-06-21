@@ -1,9 +1,9 @@
-const typesDictionary = {
-  PALACE: 'Дворец',
-  FLAT: 'Квартира',
-  HOUSE: 'Дом',
-  BUNGALOW: 'Бунгало',
-  HOTEL: 'Отель',
+export const typesDictionary = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalow: 'Бунгало',
+  hotel: 'Отель',
 };
 
 /**
@@ -33,7 +33,7 @@ const createCard = (cardData) => {
   popupTitle.textContent = cardData.offer.title;
   popupTextAddress.textContent = cardData.offer.address;
   popupTextPrice.textContent =`${cardData.offer.price} ₽/ночь`;
-  popupType.textContent = typesDictionary[cardData.offer.type.toLocaleUpperCase()];
+  popupType.textContent = typesDictionary[cardData.offer.type];
   popupTextCapacity.textContent = `${cardData.offer.rooms} комнаты для ${cardData.offer.guests} гостей`;
   popupTextTime.textContent = `Заезд после ${cardData.offer.checkin}, выезд до ${cardData.offer.checkout}`;
   popupAvatar.src = cardData.author.avatar;
