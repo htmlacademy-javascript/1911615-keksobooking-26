@@ -1,9 +1,13 @@
-import { getNumberInRange, getIntegerInRange, shuffle, getRandomArray } from './util.js';
+import './ad.js';
+import {
+  getNumberInRange,
+  getIntegerInRange,
+  getItemsFromArray,
+  getItemFromArray
+} from './util.js';
 
 /**
- * Список заголовков предложения.
- * @constant
- * @type {string[]}
+ * Варианты заголовков.
  */
 const TITLES = [
   'Aparthotel Stare Miasto',
@@ -19,11 +23,9 @@ const TITLES = [
 ];
 
 /**
- * Список типов жилья.
- * @constant
- * @type {string[]}
+ * Варианты видов жилья.
  */
-const TYPES = [
+const OFFER_TYPES = [
   'palace',
   'flat',
   'house',
@@ -32,22 +34,18 @@ const TYPES = [
 ];
 
 /**
- * Список доступных часов заселения и выселения.
- * @constant
- * @type {string[]}
+ * Часы заезда и выезда.
  */
-const CHECK_TIMES = [
+const CHECK_HOURS = [
   '12:00',
   '13:00',
   '14:00',
 ];
 
 /**
- * Список удобств жилья.
- * @constant
- * @type {string[]}
+ * Варианты удобств.
  */
-const FEATURES_LIST = [
+const FEATURES = [
   'wifi',
   'dishwasher',
   'parking',
@@ -57,9 +55,7 @@ const FEATURES_LIST = [
 ];
 
 /**
- * Список описаний жилья.
- * @constant
- * @type {string[]}
+ * Варианты описаний.
  */
 const DESCRIPTIONS = [
   'Апарт-отель расположен в самом центре Старого города Кракова, всего в 1 минуте ходьбы от Главной Рыночной площади.',
@@ -75,96 +71,87 @@ const DESCRIPTIONS = [
 ];
 
 /**
- * Список ссылок на фотографии жилья.
- * @constant
- * @type {string[]}
+ * Варианты фотографий.
  */
-const PHOTOS_LIST = [
+const PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/duonguyen-8LrGtIxxa4w.jpg',
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/brandon-hoogenboom-SNxQGWxZQi0.jpg',
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg',
 ];
 
 /**
- * Число генерируемых номеров изображений аватаров пользователя.
- * @constant
- * @type {number}
+ * Диапазон широты
  */
-const IMAGE_COUNT = 10;
+const LAT_RANGE = [35.65000, 35.70000];
 
 /**
- * Число генерируемых объектов.
- * @constant
- * @type {number}
+ * Диапазон долготы
  */
-const OBJECTS_COUNT = 10;
+const LNG_RANGE = [139.70000, 139.80000];
 
 /**
- * Список перемешанных неповторяющихся номеров изображений аватаров пользователя.
- * @constant
- * @type {number}
+ * Диапазон цен
  */
-const Coords = {
-  MIN_LAT: 35.65000,
-  MAX_LAT: 35.70000,
-  MIN_LNG: 139.70000,
-  MAX_LNG: 139.80000,
-  DECIMALS: 5,
-};
-
-const imageNumbers = shuffle(Array.from(Array(IMAGE_COUNT).keys()));
+const PRICE_RANGE = [1000, 100000];
 
 /**
- * Список перемешанных заголовков предложения.
- * @type {string[]}
+ * Диапазон количества комнат
  */
-const randomTitles = shuffle(TITLES);
+const ROOMS_RANGE = [1, 10];
 
 /**
- * Список перемешанных описаний жилья.
- * @type {string[]}
+ * Диапазон количества гостей
  */
-const randomDescriptions = shuffle(DESCRIPTIONS);
+const GUESTS_RANGE = [1, 10];
 
 /**
- * Создает объект с характеристиками объекта для сдачи.
- * @constructor
- * @param {number} index номер создаваемого объекта.
- * @return {Object} — готовый объект объявления
+ * Сгенерирует объявление
+ * @param {number} id Число от 1 до 10
+ * @return {Ad}
  */
-const createObject = (index) => {
+export const generateAd = (id) => {
+  /**
+   * @type {AdLocation}
+   */
   const location = {
-    lat: getNumberInRange(Coords.MIN_LAT, Coords.MAX_LAT, Coords.DECIMALS),
-    lng: getNumberInRange(Coords.MIN_LNG, Coords.MAX_LNG, Coords.DECIMALS),
+    lat: getNumberInRange(...LAT_RANGE),
+    lng: getNumberInRange(...LNG_RANGE),
+  };
+
+  /**
+   * @type {AdAuthor}
+   */
+  const author = {
+    avatar: `img/avatars/user${`${id}`.padStart(2, '0')}.png`
+  };
+
+  /**
+   * @type {AdOffer}
+   */
+  const offer = {
+    title: getItemFromArray(TITLES),
+    address: `${location.lat}, ${location.lng}`,
+    price: getIntegerInRange(...PRICE_RANGE),
+    type: getItemsFromArray(OFFER_TYPES),
+    rooms: getIntegerInRange(...ROOMS_RANGE),
+    guests: getIntegerInRange(...GUESTS_RANGE),
+    checkin: getItemFromArray(CHECK_HOURS),
+    checkout: getItemFromArray(CHECK_HOURS),
+    features: getItemsFromArray(FEATURES),
+    description: getItemFromArray(DESCRIPTIONS),
+    photos: getItemsFromArray(PHOTOS),
   };
 
   return {
-    author: {
-      avatar: `img/avatars/user${String(imageNumbers[index] + 1).padStart(2, '0')}.png`
-    },
-    offer: {
-      title: randomTitles[index],
-      address: `${location.lat}, ${location.lng}`,
-      price: getIntegerInRange(1000, 10000),
-      type: shuffle(TYPES)[0],
-      rooms: getIntegerInRange(1, 5),
-      guests: getIntegerInRange(1, 10),
-      checkin: shuffle(CHECK_TIMES)[0],
-      checkout: shuffle(CHECK_TIMES)[0],
-      features: getRandomArray(FEATURES_LIST),
-      description: randomDescriptions[index],
-      photos: getRandomArray(PHOTOS_LIST),
-    },
+    author,
+    offer,
     location
   };
 };
 
 /**
- * Создает список из объектов с характеристиками объекта для сдачи.
- * @constructor
- * @return {Array} — массив сгенерированных объявлений
+ * Сгенерирует список объявлений
+ * @param {number} length Длина списка
  */
-const generateObjects = () => Array.from({ length: OBJECTS_COUNT }, (x, i) => createObject(i));
-
-const randomObjects = generateObjects();
-export { randomObjects };
+export const generateAds = (length = 10) =>
+  Array.from({length}, (item, index) => generateAd(index + 1));
