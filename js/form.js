@@ -79,7 +79,7 @@ pristine.addValidator(adForm.querySelector('#title'), validateTittle,'От 2 д�
 
 
 
-const priceField = adForm.querySelector('#price')
+const priceField = adForm.querySelector('#price');
 const typeField = adForm.querySelector('[name="type"]');
 const minPriceDictionary = {
   palace: 10000,
