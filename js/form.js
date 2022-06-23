@@ -1,5 +1,5 @@
 import {isEscapeKey, isEnterKey} from './util.js';
-import { typesDictionary } from './card-popup.js';
+import { offerNameByType } from './card-popup.js';
 
 const adForm = document.querySelector('.ad-form');
 const adFormElements = adForm.children;
@@ -60,7 +60,7 @@ const createValidationMessage = (message) => {
   mainBody.appendChild(messageElement);
 };
 
-createValidationMessage(FormSuccess);
+createValidationMessage(FormError);
 
 // Валидация формы
 const pristine = new Pristine(adForm, {
@@ -75,9 +75,6 @@ function validateTittle (value) {
 }
 
 pristine.addValidator(adForm.querySelector('#title'), validateTittle,'От 2 до 50 символов');
-
-
-
 
 const priceField = adForm.querySelector('#price');
 const typeField = adForm.querySelector('[name="type"]');
@@ -95,7 +92,7 @@ function validatePrice () {
 
 function getPriceErrorMessage () {
   return `
-  Цена номера типа ${typesDictionary[typeField.value]} должна быть не менее ${minPriceDictionary[typeField.value]} руб.
+  Для типа жилья "${offerNameByType[typeField.value]}" минимальная цена - ${minPriceDictionary[typeField.value]} руб.
   `;
 }
 pristine.addValidator(priceField, validatePrice, getPriceErrorMessage);
@@ -106,8 +103,6 @@ function onTypeChange () {
 }
 
 typeField.addEventListener('change', onTypeChange);
-
-
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();

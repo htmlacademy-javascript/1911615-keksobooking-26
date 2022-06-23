@@ -50,44 +50,33 @@ export function getItemsFromArray(items) {
   if (!Array.isArray(items)) {
     throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
   }
-  const splicedItems = items.slice();
-  for (let index = items.length - 1; index > -1; index--) {
-    splicedItems.splice(index, getIntegerInRange(0, 1));
+  const newItems = [...items];
+  let {length} = items;
+  while (length--) {
+    newItems.splice(length, getIntegerInRange(0, 1));
   }
-  return splicedItems;
+  return newItems;
 }
 
-console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
-console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
-console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
-console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
-console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
+// /**
+//  * Вернет перемешанный массив на основании алгоритма Фишера-Йетса.
+//  * @template Item
+//  * @param {Item[]} items
+//  */
+// export function shuffle(items) {
+//   if (!Array.isArray(items)) {
+//     throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
+//   }
+//   const shuffledItems = items.slice();
+//   let position;
+//   for (let index = items.length - 1; index > 0; index--) {
+//     position = Math.floor(Math.random() * (index + 1));
+//     [shuffledItems[index], shuffledItems[position]] = [shuffledItems[position], shuffledItems[index]];
+//   }
+//   return shuffledItems;
+// }
 
-/**
- * Вернет перемешанный массив на основании алгоритма Фишера-Йетса.
- * @template Item
- * @param {Item[]} items
- */
-export function shuffle(items) {
-  if (!Array.isArray(items)) {
-    throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
-  }
-  const shuffledItems = items.slice();
-  let position;
-  for (let index = items.length - 1; index > 0; index--) {
-    position = Math.floor(Math.random() * (index + 1));
-    [shuffledItems[index], shuffledItems[position]] = [shuffledItems[position], shuffledItems[index]];
-  }
-  return shuffledItems;
-}
-
-console.log(shuffle([1,2,3,4,5,6,7,8,9]));
-console.log(shuffle([1,2,3,4,5,6,7,8,9]));
-console.log(shuffle([1,2,3,4,5,6,7,8,9]));
-console.log(shuffle([1,2,3,4,5,6,7,8,9]));
-console.log(shuffle([1,2,3,4,5,6,7,8,9]));
-
-export function isEscapeKey (evt) {
+export function isEscapeKey(evt) {
   return evt.key === 'Escape';
 }
 
@@ -97,28 +86,31 @@ export function isEnterKey(evt) {
 
 export const endingsForGuests = new Map ([
   ['one', 'я'],
-  ['other', 'ей']
+  ['few', 'ей'],
+  ['many', 'ей'],
 ]);
 
 export const endingsForRooms = new Map ([
   ['one', 'а'],
-  ['other', '']
+  ['few', 'ы'],
+  ['many', '']
 ]);
 
 /**
  * Вернет префикс или окончание для слова сочетаемого с числительным `number`.
- * @param {number} number число для склонения.
- * @param {Map <string, string>} endings Карта префиксов или окончаний для слова.
+ * @param {number} value Число для склонения.
+ * @param {Map <string, string>} endings Карта окончаний для слова.
  * @returns {string}
  */
-export function formatPlurals (number, endings) {
-  const pluralRule = new Intl.PluralRules('en-US');
+export function getPluralEnding(value, endings) {
+  const pluralRules = new Intl.PluralRules('ru');
+
   if (!(endings instanceof Map)) {
-    throw new Error(`Переданные данные не являются картой префиксов или окончаний (${typeof endings}: ${endings}`);
+    throw new Error(`Переданные данные не являются картой окончаний (${typeof endings}: ${endings}`);
   }
-  if (!Number.isFinite(number)) {
-    throw new Error(`Аргумент не является числовым (${typeof number}: ${number}`);
+  if (!Number.isInteger(value)) {
+    throw new Error(`Аргумент не является целым числом (${typeof value}: ${value}`);
   }
-  const rule = pluralRule.select(number);
+  const rule = pluralRules.select(value);
   return endings.get(rule);
 }
