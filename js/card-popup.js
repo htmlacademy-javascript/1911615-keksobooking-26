@@ -1,6 +1,7 @@
-import { formatPlurals, endingsForGuests, endingsForRooms } from './util.js';
+import './ad.js';
+import { getPluralEnding, endingsForGuests, endingsForRooms } from './util.js';
 
-export const typesDictionary = {
+export const offerNameByType = {
   palace: 'Дворец',
   flat: 'Квартира',
   house: 'Дом',
@@ -8,67 +9,79 @@ export const typesDictionary = {
   hotel: 'Отель',
 };
 
+function formatPrice(value) {
+  return `${value.toLocaleString('ru')} <span> ₽/ночь</span>`;
+}
+
+function formatCapacity(rooms, guests) {
+  const roomsEnding = getPluralEnding(rooms, endingsForRooms);
+  const guestsEnding = getPluralEnding(guests, endingsForGuests);
+  return `${rooms} комнат${roomsEnding} для ${guests} гост${guestsEnding}`;
+}
+
+function formatCheckHours(checkin, checkout) {
+  return `Заезд после ${checkin}, выезд до ${checkout}`;
+}
+
 /**
-  * Создает DOM Элемент с характеристиками объекта для сдачи.
-  * @constructor
-  * @param {Object} объект объявления.
-  * @return {HTMLElement} — карточка объявления на основе объекта.
-*/
-const createCard = (cardData) => {
-  const cardTemplate = document.querySelector('#card')
-    .content
-    .querySelector('.popup');
-  const cardElement = cardTemplate.cloneNode(true);
-  const popupTitle = cardElement.querySelector('.popup__title');
-  const popupTextAddress = cardElement.querySelector('.popup__text--address');
-  const popupTextPrice = cardElement.querySelector('.popup__text--price');
-  const popupType = cardElement.querySelector('.popup__type');
-  const popupTextCapacity = cardElement.querySelector('.popup__text--capacity');
-  const popupTextTime = cardElement.querySelector('.popup__text--time');
-  const popupAvatar = cardElement.querySelector('.popup__avatar');
-  const popupDescription = cardElement.querySelector('.popup__description');
-  const popupFeatures = cardElement.querySelectorAll('.popup__feature');
-  const popupPhotos = cardElement.querySelector('.popup__photos');
-  const popupPhoto = cardElement.querySelector('.popup__photo');
+ * @type {HTMLTemplateElement}
+ */
+const cardTemplate = document.querySelector('#card');
 
-  // Обязательные поля
-  popupTitle.textContent = cardData.offer.title;
-  popupTextAddress.textContent = cardData.offer.address;
-  popupTextPrice.textContent =`${cardData.offer.price} ₽/ночь`;
-  popupType.textContent = typesDictionary[cardData.offer.type];
-  popupTextCapacity.textContent = `${cardData.offer.rooms} комнат${formatPlurals(cardData.offer.rooms, endingsForRooms)} для ${cardData.offer.guests} гост${formatPlurals(cardData.offer.guests, endingsForGuests)}`;
-  popupTextTime.textContent = `Заезд после ${cardData.offer.checkin}, выезд до ${cardData.offer.checkout}`;
-  popupAvatar.src = cardData.author.avatar;
+/**
+ * Создает DOM Элемент с характеристиками объекта для сдачи.
+ * @param {Ad} ad Объявление.
+ */
+export function createCardNode({offer, author}) {
+  const root = cardTemplate.content.cloneNode(true);
 
-  // Необязательные поля
-  popupDescription.textContent = cardData.offer.description ? cardData.offer.description : popupDescription.classList.add('hidden');
+  // Аватарка
+  root.querySelector('.popup__avatar').src = author.avatar;
 
-  const featureModifiers = cardData.offer.features.map((objectFeature) =>`popup__feature--${objectFeature}`);
-  popupFeatures.forEach((feature) => {
-    const modifier = feature.classList[1];
+  // Текстовые элементы
+  const textBySelector = {
+    '.popup__title': offer.title,
+    '.popup__text--address': offer.address,
+    '.popup__text--price': formatPrice(offer.price),
+    '.popup__type': offerNameByType[offer.type],
+    '.popup__text--capacity': formatCapacity(offer.rooms, offer.guests),
+    '.popup__text--time': formatCheckHours(offer.checkin, offer.checkout),
+    '.popup__description': offer.description
+  };
 
-    if (!featureModifiers.includes(modifier)) {
-      feature.remove();
+  Object.keys(textBySelector).forEach((key) => {
+    const node = root.querySelector(key);
+    if (textBySelector[key]) {
+      const propertyName = key.endsWith('price') ? 'innerHTML' : 'textContent';
+      node[propertyName] = textBySelector[key];
+    } else {
+      node.remove();
     }
   });
 
-  const photosList = cardData.offer.photos;
-  if (photosList.length === 1) {
-    popupPhoto.src = photosList[0];
-  }
-  else if (photosList.length > 1){
-    popupPhoto.src = photosList[0];
-    for (let i = 0; i < photosList.length-1;i++) {
-      const newPhoto = popupPhoto.cloneNode();
-      newPhoto.src = photosList[i+1];
-      popupPhotos.append(newPhoto);
-    }
-  }
-  else {
-    popupPhotos.classList.add('hidden');
+  //Иконки удобств
+  const featuresRoot = root.querySelector('.popup__features');
+  if (offer.features.length) {
+    const selectors = offer.features.map((name) => `.popup__feature--${name}`);
+    const featureNodes = featuresRoot.querySelectorAll(selectors.join(',') || null);
+    featuresRoot.replaceChildren(...featureNodes);
+  } else {
+    featuresRoot.remove();
   }
 
-  return cardElement;
-};
+  // Фотографии
+  const photosRoot = root.querySelector('.popup__photos');
+  if (offer.photos.length) {
+    const placeholderNode = root.querySelector('.popup__photo');
+    const photosNodes = offer.photos.map((src) => {
+      const node = placeholderNode.cloneNode();
+      return Object.assign(node, {src});
+    });
+    photosRoot.replaceChildren(...photosNodes);
+  } else {
+    photosRoot.remove();
+  }
 
-export {createCard};
+  return root;
+}
+
