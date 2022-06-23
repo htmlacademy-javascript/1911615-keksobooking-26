@@ -28,43 +28,64 @@ export function getIntegerInRange(min, max) {
 }
 
 /**
- * Вернет случайный элемент массива `array`.
- * @param {array} array Массив элементов.
+ * Вернет случайный элемент массива
+ * @template Item
+ * @param {Item[]} items
  */
-export function getElementInArray(array) {
-  if (!Array.isArray(array) || !array.length) {
-    throw new TypeError(`Аргумент не является массивом: (${typeof array}: ${array}`);
+export function getItemFromArray(items) {
+  if (!Array.isArray(items)) {
+    throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
   }
-  return array[getIntegerInRange(0, array.length-1)];
-}
-
-// console.log(getElementInArray(1));
-// console.log(getElementInArray([]));
-// console.log(getElementInArray([1]));
-// console.log(getElementInArray([1, 2]));
-
-/**
- * Функция, перемешивающая элементы диапазона на основании алгоритма Фишера-Йетса.
- * @param {array} arr - Массив для перемешивания
- * @returns {array} Перемешанный массив
- */
-export function shuffle(arr) {
-  let j;
-  for (let i = arr.length - 1; i > 0; i--) {
-    j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
+  const lastIndex = Math.max(0, items.length - 1);
+  const index = getIntegerInRange(0, lastIndex);
+  return items[index];
 }
 
 /**
- * Функция, выдающая массив из случайного числа случайных неповторяющихся элементов массива.
- * @param {array} arr - Исходный массив
- * @returns {array} Случайный массив
+ * Вернет случайное количество элементов массива
+ * @template Item
+ * @param {Item[]} items
  */
-export function getRandomArray(arr) {
-  return shuffle(arr).slice(0, getNumberInRange(1, arr.length));
+export function getItemsFromArray(items) {
+  if (!Array.isArray(items)) {
+    throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
+  }
+  const splicedItems = items.slice();
+  for (let index = items.length - 1; index > -1; index--) {
+    splicedItems.splice(index, getIntegerInRange(0, 1));
+  }
+  return splicedItems;
 }
+
+console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
+console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
+console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
+console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
+console.log(getItemsFromArray([1,2,3,4,5,6,7,8,9]));
+
+/**
+ * Вернет перемешанный массив на основании алгоритма Фишера-Йетса.
+ * @template Item
+ * @param {Item[]} items
+ */
+export function shuffle(items) {
+  if (!Array.isArray(items)) {
+    throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
+  }
+  const shuffledItems = items.slice();
+  let position;
+  for (let index = items.length - 1; index > 0; index--) {
+    position = Math.floor(Math.random() * (index + 1));
+    [shuffledItems[index], shuffledItems[position]] = [shuffledItems[position], shuffledItems[index]];
+  }
+  return shuffledItems;
+}
+
+console.log(shuffle([1,2,3,4,5,6,7,8,9]));
+console.log(shuffle([1,2,3,4,5,6,7,8,9]));
+console.log(shuffle([1,2,3,4,5,6,7,8,9]));
+console.log(shuffle([1,2,3,4,5,6,7,8,9]));
+console.log(shuffle([1,2,3,4,5,6,7,8,9]));
 
 export function isEscapeKey (evt) {
   return evt.key === 'Escape';
@@ -74,3 +95,30 @@ export function isEnterKey(evt) {
   return evt.key === 'Enter';
 }
 
+export const endingsForGuests = new Map ([
+  ['one', 'я'],
+  ['other', 'ей']
+]);
+
+export const endingsForRooms = new Map ([
+  ['one', 'а'],
+  ['other', '']
+]);
+
+/**
+ * Вернет префикс или окончание для слова сочетаемого с числительным `number`.
+ * @param {number} number число для склонения.
+ * @param {Map <string, string>} endings Карта префиксов или окончаний для слова.
+ * @returns {string}
+ */
+export function formatPlurals (number, endings) {
+  const pluralRule = new Intl.PluralRules('en-US');
+  if (!(endings instanceof Map)) {
+    throw new Error(`Переданные данные не являются картой префиксов или окончаний (${typeof endings}: ${endings}`);
+  }
+  if (!Number.isFinite(number)) {
+    throw new Error(`Аргумент не является числовым (${typeof number}: ${number}`);
+  }
+  const rule = pluralRule.select(number);
+  return endings.get(rule);
+}

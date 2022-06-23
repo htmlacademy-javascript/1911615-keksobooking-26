@@ -1,3 +1,5 @@
+import { formatPlurals, endingsForGuests, endingsForRooms } from './util.js';
+
 export const typesDictionary = {
   palace: 'Дворец',
   flat: 'Квартира',
@@ -7,7 +9,7 @@ export const typesDictionary = {
 };
 
 /**
-  * Создает DOM Элемент с храктеристиками объекта для сдачи.
+  * Создает DOM Элемент с характеристиками объекта для сдачи.
   * @constructor
   * @param {Object} объект объявления.
   * @return {HTMLElement} — карточка объявления на основе объекта.
@@ -34,7 +36,7 @@ const createCard = (cardData) => {
   popupTextAddress.textContent = cardData.offer.address;
   popupTextPrice.textContent =`${cardData.offer.price} ₽/ночь`;
   popupType.textContent = typesDictionary[cardData.offer.type];
-  popupTextCapacity.textContent = `${cardData.offer.rooms} комнаты для ${cardData.offer.guests} гостей`;
+  popupTextCapacity.textContent = `${cardData.offer.rooms} комнат${formatPlurals(cardData.offer.rooms, endingsForRooms)} для ${cardData.offer.guests} гост${formatPlurals(cardData.offer.guests, endingsForGuests)}`;
   popupTextTime.textContent = `Заезд после ${cardData.offer.checkin}, выезд до ${cardData.offer.checkout}`;
   popupAvatar.src = cardData.author.avatar;
 

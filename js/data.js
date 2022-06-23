@@ -132,7 +132,7 @@ export const generateAd = (id) => {
     title: getItemFromArray(TITLES),
     address: `${location.lat}, ${location.lng}`,
     price: getIntegerInRange(...PRICE_RANGE),
-    type: getItemsFromArray(OFFER_TYPES),
+    type: getItemFromArray(OFFER_TYPES),
     rooms: getIntegerInRange(...ROOMS_RANGE),
     guests: getIntegerInRange(...GUESTS_RANGE),
     checkin: getItemFromArray(CHECK_HOURS),
