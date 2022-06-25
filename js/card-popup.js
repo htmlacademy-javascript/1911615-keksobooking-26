@@ -1,5 +1,20 @@
 import './ad.js';
-import { getPluralEnding, endingsForGuests, endingsForRooms } from './util.js';
+
+const pluralRules = new Intl.PluralRules('ru');
+
+const pluralsForGuests = new Map ([
+  ['one', 'гостя'],
+  ['few', 'гостей'],
+  ['many', 'гостей'],
+  ['other', 'гостей']
+]);
+
+const roomsUnitByRule = new Map ([
+  ['one', 'комната'],
+  ['few', 'комнаты'],
+  ['many', 'комнат'],
+  ['other', 'комнат']
+]);
 
 export const offerNameByType = {
   palace: 'Дворец',
@@ -9,16 +24,30 @@ export const offerNameByType = {
   hotel: 'Отель',
 };
 
+/**
+ * Форматирует стоимость объявления.
+ * @param {number} value Стоимость аренды.
+ */
 function formatPrice(value) {
   return `${value.toLocaleString('ru')} <span> ₽/ночь</span>`;
 }
 
+/**
+ * Форматирует количество комнат и гостей.
+ * @param {number} rooms Количество комнат.
+ * @param {number} guests Количество гостей.
+ */
 function formatCapacity(rooms, guests) {
-  const roomsEnding = getPluralEnding(rooms, endingsForRooms);
-  const guestsEnding = getPluralEnding(guests, endingsForGuests);
-  return `${rooms} комнат${roomsEnding} для ${guests} гост${guestsEnding}`;
+  const roomsEnding = roomsUnitByRule.get(pluralRules.select(rooms));
+  const guestsEnding = pluralsForGuests.get(pluralRules.select(guests));
+  return `${rooms} ${roomsEnding} для ${guests} ${guestsEnding}`;
 }
 
+/**
+ * Форматирует время заезда и выезда.
+ * @param {string} checkin Время заезда.
+ * @param {string} checkout Время выезда.
+ */
 function formatCheckHours(checkin, checkout) {
   return `Заезд после ${checkin}, выезд до ${checkout}`;
 }
@@ -73,11 +102,11 @@ export function createCardNode({offer, author}) {
   const photosRoot = root.querySelector('.popup__photos');
   if (offer.photos.length) {
     const placeholderNode = root.querySelector('.popup__photo');
-    const photosNodes = offer.photos.map((src) => {
+    const photosNode = offer.photos.map((src) => {
       const node = placeholderNode.cloneNode();
       return Object.assign(node, {src});
     });
-    photosRoot.replaceChildren(...photosNodes);
+    photosRoot.replaceChildren(...photosNode);
   } else {
     photosRoot.remove();
   }
