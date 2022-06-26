@@ -1,4 +1,5 @@
 import { offerNameByType } from './card-popup.js';
+import { createModal, successMessageElement, errorMessageElement } from './modal';
 
 const adForm = document.querySelector('.ad-form');
 const adFormElements = adForm.children;
@@ -154,6 +155,12 @@ timeoutField.addEventListener('change', onTimeoutChange);
 // Валидация формы
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
-  pristine.validate();
+
+  const isValid = pristine.validate();
+  if (isValid) {
+    createModal(errorMessageElement);
+  } else {
+    createModal(successMessageElement);
+  }
 });
 
