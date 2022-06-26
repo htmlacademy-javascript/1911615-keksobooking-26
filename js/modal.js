@@ -1,6 +1,6 @@
 const mainBody  = document.querySelector('body');
-export const successMessageElement = document.querySelector('#success').content.cloneNode(true);
-export const errorMessageElement = document.querySelector('#error').content.cloneNode(true);
+export const successMessageElement = document.querySelector('#success');
+export const errorMessageElement = document.querySelector('#error');
 
 const onPopupEscKeydown = (evt) => {
   if (evt.key === 'Escape') {
@@ -33,14 +33,15 @@ function removeModal() {
 }
 
 export function createModal(target) {
-  const messageErrorButton = target.querySelector('.error__button');
+  const fragment= target.content.cloneNode(true);
+  const messageErrorButton = fragment.querySelector('.error__button');
   document.addEventListener('keydown', onPopupEscKeydown);
   if (messageErrorButton) {
     messageErrorButton.addEventListener('click', removeModal);
   }
-  target.querySelector('div').addEventListener('click', removeModal);
+  fragment.querySelector('div').addEventListener('click', removeModal);
 
-  return mainBody.appendChild(target);
+  return mainBody.appendChild(fragment);
 }
 
 
