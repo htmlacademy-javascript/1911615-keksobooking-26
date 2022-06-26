@@ -1,60 +1,46 @@
-export function createModal(target) {
+const mainBody  = document.querySelector('body');
+const successMessageElement = document.querySelector('#success').content.cloneNode(true);
+const errorMessageElement = document.querySelector('#error').content.cloneNode(true);
 
-  return {
-    open() {
+const onPopupEscKeydown = (evt) => {
+  if (evt.key === 'Escape') {
+    evt.preventDefault();
+    removeModal();
+  }
+};
 
-    },
-    close() {
+// export function createModal(target) {
 
-    }
-  };
-}
+//   return {
+//     open() {
 
-function isEscapeKey(evt) {
-  return evt.key === 'Escape';
-}
+//     },
+//     close() {
 
-function isEnterKey(evt) {
-  return evt.key === 'Enter';
-}
+//     }
+//   };
+// }
+
 
 // Сообщения об ошибке/успехе валидации
-const mainBody  = document.querySelector('body');
-const FormSuccess = 'success';
-const FormError = 'error';
 
-const removeValidationMessage = (message) => {
-  const messageElement = document.querySelector(`.${message}`);
-  mainBody.removeChild(messageElement);
-};
-
-const createValidationMessage = (message) => {
-  const messageTemplate = document.querySelector(`#${message}`)
-    .content
-    .querySelector(`.${message}`);
-  const messageElement = messageTemplate.cloneNode(true);
-
-  if (message === FormError) {
-    const messageErrorButton = messageElement.querySelector('.error__button');
-    messageErrorButton.addEventListener('click', () => {
-      removeValidationMessage(message);
-    });
-    messageErrorButton.addEventListener('keydown', (evt) => {
-      if (isEnterKey(evt)) {
-        removeValidationMessage(message);
-      }
-    });
+function removeModal() {
+  if (mainBody.querySelector('.error') || mainBody.querySelector('.success')) {
+    const target = mainBody.querySelector('.error') ? mainBody.querySelector('.error') : mainBody.querySelector('.success');
+    document.removeEventListener('keydown', onPopupEscKeydown);
+    mainBody.removeChild(target);
   }
-  messageElement.addEventListener('click', () => {
-    removeValidationMessage(message);
-  });
-  document.addEventListener('keydown', (evt) => {
-    if (isEscapeKey(evt)) {
-      evt.preventDefault();
-      removeValidationMessage(message);
-    }
-  });
-  mainBody.appendChild(messageElement);
-};
+}
 
-createValidationMessage(FormError);
+function createModal(target) {
+  const messageErrorButton = target.querySelector('.error__button');
+  document.addEventListener('keydown', onPopupEscKeydown);
+  if (messageErrorButton) {
+    messageErrorButton.addEventListener('click', removeModal);
+  }
+  target.querySelector('div').addEventListener('click', removeModal);
+
+  return mainBody.appendChild(target);
+}
+
+createModal(errorMessageElement);
