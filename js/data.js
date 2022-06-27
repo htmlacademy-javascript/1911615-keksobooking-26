@@ -1,10 +1,14 @@
-import {getRandomNumber, shuffle, getRandomArray} from './util.js';
+import './ad.js';
+import {
+  getNumberInRange,
+  getIntegerInRange,
+  getItemsFromArray,
+  getItemFromArray
+} from './util.js';
 
 /**
-  * Список заголовков предложения.
-  * @constant
-  * @type {string[]}
-*/
+ * Варианты заголовков.
+ */
 const TITLES = [
   'Aparthotel Stare Miasto',
   'Sugar Loft Apartments',
@@ -19,11 +23,9 @@ const TITLES = [
 ];
 
 /**
-  * Список типов жилья.
-  * @constant
-  * @type {string[]}
-*/
-const TYPES = [
+ * Варианты видов жилья.
+ */
+const OFFER_TYPES = [
   'palace',
   'flat',
   'house',
@@ -32,22 +34,18 @@ const TYPES = [
 ];
 
 /**
-  * Список доступных часов заселения и выселения.
-  * @constant
-  * @type {string[]}
-*/
-const CHECK_TIMES = [
+ * Часы заезда и выезда.
+ */
+const CHECK_HOURS = [
   '12:00',
   '13:00',
   '14:00',
 ];
 
 /**
-  * Список удобств жилья.
-  * @constant
-  * @type {string[]}
-*/
-const FEATURES_LIST = [
+ * Варианты удобств.
+ */
+const FEATURES = [
   'wifi',
   'dishwasher',
   'parking',
@@ -57,10 +55,8 @@ const FEATURES_LIST = [
 ];
 
 /**
-  * Список описаний жилья.
-  * @constant
-  * @type {string[]}
-*/
+ * Варианты описаний.
+ */
 const DESCRIPTIONS = [
   'Апарт-отель расположен в самом центре Старого города Кракова, всего в 1 минуте ходьбы от Главной Рыночной площади.',
   'Наше красивое здание, построенное в 30-х годах, сегодня является культурным наследием города Рио-де-Жанейро. Полностью отремонтирован с помощью модернизации.',
@@ -68,103 +64,96 @@ const DESCRIPTIONS = [
   'Отель с видом на сад и бесплатным Wi-Fi расположен в Лондоне, в 1,1 км от Музея Мадам Тюссо и в 1,6 км от крикетного поля Лорда. ',
   'Отель является официальным "особенным домом" для туристов. Он расположен в центре Гавана-Вьеха; всего в 10 метрах от улицы Обиспо и в 200 метрах от "Флоридита".',
   'Впечатляющий дом в центре Гаваны, где ваш комфорт будет гарантирован.',
-  'Это дом в стиле ар-деко, построенный в 1929 году из высоких стоек, с потолки высотой 4,80 метра, с красивым входом с оригинальной рельефной мозаикой и мраморной лестницей, ведущей на верхний этаж.',
+  'Это дом в стиле арт-деко, построенный в 1929 году из высоких стоек, с потолки высотой 4,80 метра, с красивым входом с оригинальной рельефной мозаикой и мраморной лестницей, ведущей на верхний этаж.',
   'Небольшой семейный туристический коттедж, расположенный в 2 км от центра Сантьяго-де-Компостела, в тихом и легкодоступном районе. Удобные и приятные удобства. ',
   'Дом расположен в красивом районе Ведадо, недалеко от культурных центров, магазинов и проспекта 23, что облегчает транспорт.',
   'Мы предлагаем трехместные, двухместные и двухместные номера в нашем доме, красивом 200-метровом полностью отреставрированном колониальном доме 1883 года постройки.Наш дом представляет собой аутентичный дом в колониальном стиле, построенный в 1883 году, с деревянными потолками высотой более 5 метров.',
 ];
 
 /**
-  * Список ссылок на фотографии жилья.
-  * @constant
-  * @type {string[]}
-*/
-const PHOTOS_LIST = [
+ * Варианты фотографий.
+ */
+const PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/duonguyen-8LrGtIxxa4w.jpg',
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/brandon-hoogenboom-SNxQGWxZQi0.jpg',
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg',
 ];
 
 /**
-  * Число генерируемых номеров изображений аватаров пользователя.
-  * @constant
-  * @type {number}
-*/
-const IMAGE_COUNT = 10;
+ * Диапазон широты
+ */
+const LAT_RANGE = [35.65000, 35.70000];
 
 /**
-  * Число генерируемых объектов.
-  * @constant
-  * @type {number}
-*/
-const OBJECTS_COUNT= 10;
+ * Диапазон долготы
+ */
+const LNG_RANGE = [139.70000, 139.80000];
 
 /**
-  * Список перемешанных неповторяющихся номеров изображений аватаров пользователя.
-  * @constant
-  * @type {number}
-*/
-const Coords = {
-  MIN_LAT: 35.65000,
-  MAX_LAT: 35.70000,
-  MIN_LNG: 139.70000,
-  MAX_LNG: 139.80000,
-  DECIMALS: 5,
-};
-
-const imageNumbers = shuffle(Array.from(Array(IMAGE_COUNT).keys()));
+ * Диапазон цен
+ */
+const PRICE_RANGE = [1000, 100000];
 
 /**
-  * Список перемешанных заголовков предложения.
-  * @type {string[]}
-*/
-const randomTitles = shuffle(TITLES);
+ * Диапазон количества комнат
+ */
+const ROOMS_RANGE = [1, 10];
 
 /**
-  * Список перемешанных описаний жилья.
-  * @type {string[]}
-*/
-const randomDescriptions = shuffle(DESCRIPTIONS);
+ * Диапазон количества гостей
+ */
+const GUESTS_RANGE = [1, 10];
 
 /**
-  * Создает объект с храктеристиками объекта для сдачи.
-  * @constructor
-  * @param {number} index номер создаваемого объекта.
-  * @return {Object} — готовый объект объявления
-*/
-const createObject = (index) => {
+ * Сгенерирует объявление
+ * @param {number} id Число от 1 до 10
+ * @return {Ad}
+ */
+const generateAd = (id) => {
+  /**
+   * @type {AdLocation}
+   */
   const location = {
-    lat: getRandomNumber(Coords.MIN_LAT, Coords.MAX_LAT, Coords.DECIMALS),
-    lng: getRandomNumber(Coords.MIN_LNG, Coords.MAX_LNG, Coords.DECIMALS),
+    lat: getNumberInRange(...LAT_RANGE),
+    lng: getNumberInRange(...LNG_RANGE),
+  };
+
+  /**
+   * @type {AdAuthor}
+   */
+  const author = {
+    avatar: `img/avatars/user${`${id}`.padStart(2, '0')}.png`
+  };
+
+  /**
+   * @type {AdOffer}
+   */
+  const offer = {
+    title: getItemFromArray(TITLES),
+    address: `${location.lat}, ${location.lng}`,
+    price: getIntegerInRange(...PRICE_RANGE),
+    type: getItemFromArray(OFFER_TYPES),
+    rooms: getIntegerInRange(...ROOMS_RANGE),
+    guests: getIntegerInRange(...GUESTS_RANGE),
+    checkin: getItemFromArray(CHECK_HOURS),
+    checkout: getItemFromArray(CHECK_HOURS),
+    features: getItemsFromArray(FEATURES),
+    description: getItemFromArray(DESCRIPTIONS),
+    photos: getItemsFromArray(PHOTOS),
   };
 
   return {
-    author : {
-      avatar : `img/avatars/user${String(imageNumbers[index]+1).padStart(2, '0')}.png`
-    },
-    offer: {
-      title : randomTitles[index],
-      address : `${location.lat}, ${location.lng}`,
-      price : getRandomNumber(1000,10000),
-      type : shuffle(TYPES)[0],
-      rooms : getRandomNumber(1,5),
-      guests : getRandomNumber(1,10),
-      checkin : shuffle(CHECK_TIMES)[0],
-      checkout : shuffle(CHECK_TIMES)[0],
-      features : getRandomArray(FEATURES_LIST),
-      description : randomDescriptions[index],
-      photos : getRandomArray(PHOTOS_LIST),
-    },
+    author,
+    offer,
     location
   };
 };
 
 /**
-  * Создает список из объектов с храктеристиками объекта для сдачи.
-  * @constructor
-  * @return {Array} — массив сгенерированных объявлений
-*/
-const generateObjects = () => Array.from({length: OBJECTS_COUNT}, (x, i) => createObject(i));
+ * Сгенерирует список объявлений
+ * @param {number} length Длина списка
+ */
+const generateAds = (length = 10) =>
+  Array.from({length}, (item, index) => generateAd(index + 1));
 
-const randomObjects = generateObjects();
-export {randomObjects};
+export default generateAds;

@@ -1,78 +1,118 @@
-import {getRandomNumber} from './util.js';
-import {randomObjects} from './data.js';
+import './ad.js';
 
-const typesDictionary = {
-  PALACE: 'Дворец',
-  FLAT: 'Квартира',
-  HOUSE: 'Дом',
-  BUNGALOW: 'Бунгало',
-  HOTEL: 'Отель',
+const pluralRules = new Intl.PluralRules('ru');
+
+const pluralsForGuests = new Map ([
+  ['one', 'гостя'],
+  ['few', 'гостей'],
+  ['many', 'гостей'],
+  ['other', 'гостей']
+]);
+
+const roomsUnitByRule = new Map ([
+  ['one', 'комната'],
+  ['few', 'комнаты'],
+  ['many', 'комнат'],
+  ['other', 'комнат']
+]);
+
+export const offerNameByType = {
+  palace: 'Дворец',
+  flat: 'Квартира',
+  house: 'Дом',
+  bungalow: 'Бунгало',
+  hotel: 'Отель',
 };
 
-const mapCanvas = document.querySelector('#map-canvas');
-const currentObject = randomObjects[getRandomNumber(0,randomObjects.length-1)];
+/**
+ * Форматирует стоимость объявления.
+ * @param {number} value Стоимость аренды.
+ */
+function formatPrice(value) {
+  return `${value.toLocaleString('ru')} <span> ₽/ночь</span>`;
+}
 
 /**
-  * Создает DOM Элемент с храктеристиками объекта для сдачи.
-  * @constructor
-  * @param {Object} объект объявления.
-  * @return {HTMLElement} — карточка объявления на основе объекта.
-*/
-const createCard = (cardData) => {
-  const cardTemplate = document.querySelector('#card')
-    .content
-    .querySelector('.popup');
-  const cardElement = cardTemplate.cloneNode(true);
-  const popupTitle = cardElement.querySelector('.popup__title');
-  const popupTextAddress = cardElement.querySelector('.popup__text--address');
-  const popupTextPrice = cardElement.querySelector('.popup__text--price');
-  const popupType = cardElement.querySelector('.popup__type');
-  const popupTextCapacity = cardElement.querySelector('.popup__text--capacity');
-  const popupTextTime = cardElement.querySelector('.popup__text--time');
-  const popupAvatar = cardElement.querySelector('.popup__avatar');
-  const popupDescription = cardElement.querySelector('.popup__description');
-  const popupFeatures = cardElement.querySelectorAll('.popup__feature');
-  const popupPhotos = cardElement.querySelector('.popup__photos');
-  const popupPhoto = cardElement.querySelector('.popup__photo');
+ * Форматирует количество комнат и гостей.
+ * @param {number} rooms Количество комнат.
+ * @param {number} guests Количество гостей.
+ */
+function formatCapacity(rooms, guests) {
+  const roomsEnding = roomsUnitByRule.get(pluralRules.select(rooms));
+  const guestsEnding = pluralsForGuests.get(pluralRules.select(guests));
+  return `${rooms} ${roomsEnding} для ${guests} ${guestsEnding}`;
+}
 
-  // Обязательные поля
-  popupTitle.textContent = cardData.offer.title;
-  popupTextAddress.textContent = cardData.offer.address;
-  popupTextPrice.textContent =`${cardData.offer.price} ₽/ночь`;
-  popupType.textContent = typesDictionary[cardData.offer.type.toLocaleUpperCase()];
-  popupTextCapacity.textContent = `${cardData.offer.rooms} комнаты для ${cardData.offer.guests} гостей`;
-  popupTextTime.textContent = `Заезд после ${cardData.offer.checkin}, выезд до ${cardData.offer.checkout}`;
-  popupAvatar.src = cardData.author.avatar;
+/**
+ * Форматирует время заезда и выезда.
+ * @param {string} checkin Время заезда.
+ * @param {string} checkout Время выезда.
+ */
+function formatCheckHours(checkin, checkout) {
+  return `Заезд после ${checkin}, выезд до ${checkout}`;
+}
 
-  // Необязательные поля
-  popupDescription.textContent = cardData.offer.description ? cardData.offer.description : popupDescription.classList.add('hidden');
+/**
+ * @type {HTMLTemplateElement}
+ */
+const cardTemplate = document.querySelector('#card');
 
-  const featureModifiers = cardData.offer.features.map((objectFeature) =>`popup__feature--${objectFeature}`);
-  popupFeatures.forEach((feature) => {
-    const modifier = feature.classList[1];
+/**
+ * Создает DOM Элемент с характеристиками объекта для сдачи.
+ * @param {Ad} ad Объявление.
+ */
+function createCardNode({offer, author}) {
+  const root = cardTemplate.content.cloneNode(true);
 
-    if (!featureModifiers.includes(modifier)) {
-      feature.remove();
+  // Аватарка
+  root.querySelector('.popup__avatar').src = author.avatar;
+
+  // Текстовые элементы
+  const textBySelector = {
+    '.popup__title': offer.title,
+    '.popup__text--address': offer.address,
+    '.popup__text--price': formatPrice(offer.price),
+    '.popup__type': offerNameByType[offer.type],
+    '.popup__text--capacity': formatCapacity(offer.rooms, offer.guests),
+    '.popup__text--time': formatCheckHours(offer.checkin, offer.checkout),
+    '.popup__description': offer.description
+  };
+
+  Object.keys(textBySelector).forEach((key) => {
+    const node = root.querySelector(key);
+    if (textBySelector[key]) {
+      const propertyName = key.endsWith('price') ? 'innerHTML' : 'textContent';
+      node[propertyName] = textBySelector[key];
+    } else {
+      node.remove();
     }
   });
 
-  const photosList = cardData.offer.photos;
-  if (photosList.length === 1) {
-    popupPhoto.src = photosList[0];
-  }
-  else if (photosList.length > 1){
-    popupPhoto.src = photosList[0];
-    for (let i = 0; i < photosList.length-1;i++) {
-      const newPhoto = popupPhoto.cloneNode();
-      newPhoto.src = photosList[i+1];
-      popupPhotos.append(newPhoto);
-    }
-  }
-  else {
-    popupPhotos.classList.add('hidden');
+  //Иконки удобств
+  const featuresRoot = root.querySelector('.popup__features');
+  if (offer.features.length) {
+    const selectors = offer.features.map((name) => `.popup__feature--${name}`);
+    const featureNodes = featuresRoot.querySelectorAll(selectors.join(',') || null);
+    featuresRoot.replaceChildren(...featureNodes);
+  } else {
+    featuresRoot.remove();
   }
 
-  return cardElement;
-};
+  // Фотографии
+  const photosRoot = root.querySelector('.popup__photos');
+  if (offer.photos.length) {
+    const placeholderNode = root.querySelector('.popup__photo');
+    const photosNode = offer.photos.map((src) => {
+      const node = placeholderNode.cloneNode();
+      return Object.assign(node, {src});
+    });
+    photosRoot.replaceChildren(...photosNode);
+  } else {
+    photosRoot.remove();
+  }
 
-mapCanvas.appendChild(createCard(currentObject));
+  return root;
+}
+
+export default createCardNode;
+

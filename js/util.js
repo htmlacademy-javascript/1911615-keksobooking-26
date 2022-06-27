@@ -1,57 +1,68 @@
-
 /**
-  * Функция, возвращающая случайное целое число из переданного диапазона включительно.
-  * @param {number} a - Первое число
-  * @param {number} b - Второе число
-*/
-
-function getRandomInteger(a, b) {
-  const min = Math.ceil(Math.min(Math.abs(a), Math.abs(b)));
-  const max = Math.floor(Math.max(Math.abs(a), Math.abs(b)));
-  const RandomInteger = Math.floor(Math.random() * (max - min + 1)) + min;
-  return RandomInteger;
-}
-
-/**
-  * Функция, возвращающая случайное число с указанной точностью из переданного диапазона включительно.
-  * @param {number} a - Первое число
-  * @param {number} b - Второе число
-  * @param {number} [decimals] - Количество знаков после запятой. Необязательный, 0 по умолчанию.
-*/
-
-function getRandomNumber(a, b, decimals = 0) {
-  const multiplier = Math.pow(10,decimals);
-  const min = Math.ceil(Math.min(Math.abs(a), Math.abs(b)));
-  const max = Math.floor(Math.max(Math.abs(a), Math.abs(b)));
-  if (decimals === 0) {
-    return getRandomInteger(min, max);
+ * Вернет случайное число в диапазоне `min`, `max`.
+ * @param {number} min Положительное число.
+ * @param {number} max Положительное число, большее или равное `min`.
+ * @param {number} decimals Максимальное количество знаков после запятой.
+ */
+export function getNumberInRange(min, max, decimals = 5) {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) {
+    throw new RangeError(`Диапазон не является числовым (${typeof min}: ${min}, ${typeof max}: ${max}) `);
   }
-  const RandomInteger = Math.floor(Math.random() * (Math.floor(max*multiplier) - Math.ceil(min*multiplier) + 1)) + Math.ceil(min*multiplier);
-  const RandomFloat = Math.trunc(RandomInteger) / multiplier;
-  return RandomFloat;
-}
-
-/**
-  * Функция, перемешивающая элементы диапазона на основании алгоритма Фишера-Йетса.
-  * @param {array} arr - Массив для перемешивания
-  * @returns {array} Перемешанный массив
-*/
-function shuffle(arr){
-  let j;
-  for(let i = arr.length - 1; i > 0; i--){
-    j = Math.floor(Math.random()*(i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+  if (min < 0 || max < 0 || min > max) {
+    throw new RangeError(`Неподдерживаемый диапазон: ${min}, ${max}`);
   }
-  return arr;
+  const value = (max - min) * Math.random() + min;
+  return Number(value.toFixed(decimals));
 }
 
 /**
-  * Функция, выдающая массив из случайного числа случайных неповторяющихся элементов массива.
-  * @param {array} arr - Исходный массив
-  * @returns {array} Случайный массив
-*/
-function getRandomArray(arr) {
-  return shuffle(arr).slice(0, getRandomNumber(1,arr.length));
+ * Вернет случайное целое число в диапазоне `min`, `max`.
+ * @param {number} min Целое положительное число.
+ * @param {number} max Целое положительное число, большее или равное `min`.
+ */
+export function getIntegerInRange(min, max) {
+  if (!Number.isInteger(min) || !Number.isInteger(max)) {
+    throw new RangeError(`Диапазон не является целочисленным (${typeof min}: ${min}, ${typeof max}: ${max}) `);
+  }
+  return getNumberInRange(min, max, 0);
 }
 
-export {getRandomNumber, shuffle, getRandomArray};
+/**
+ * Вернет случайный элемент массива
+ * @template Item
+ * @param {Item[]} items
+ */
+export function getItemFromArray(items) {
+  if (!Array.isArray(items)) {
+    throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
+  }
+  const lastIndex = Math.max(0, items.length - 1);
+  const index = getIntegerInRange(0, lastIndex);
+  return items[index];
+}
+
+/**
+ * Вернет случайное количество элементов массива
+ * @template Item
+ * @param {Item[]} items
+ */
+export function getItemsFromArray(items) {
+  if (!Array.isArray(items)) {
+    throw new TypeError(`Аргумент не является массивом: (${typeof items}: ${items}`);
+  }
+  const newItems = [...items];
+  let {length} = items;
+  while (length--) {
+    newItems.splice(length, getIntegerInRange(0, 1));
+  }
+  return newItems;
+}
+
+/**
+ * Переключает активность состояния формы.
+ */
+export function toggleDisabled (className, isDisabled){
+  const form = document.querySelector(`.${className}`);
+  form.classList.toggle(`${className}--disabled`, isDisabled);
+  [...form.elements].forEach((node) => (node.disabled = isDisabled));
+}

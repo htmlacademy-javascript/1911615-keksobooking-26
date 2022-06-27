@@ -1,6 +1,12 @@
-import './card-popup.js';
-import {toggleReadOnly} from './form.js';
+import createCardNode from './card-popup.js';
+import generateAds from './data.js';
+import './ad-constraints.js';
+// import {toggleDisabled} from './util.js';
 
-toggleReadOnly();
-toggleReadOnly();
+
+const mapCanvas = document.querySelector('#map-canvas');
+mapCanvas.appendChild(createCardNode(generateAds()[0]));
+
+// toggleDisabled('ad-form', true);
+
 
