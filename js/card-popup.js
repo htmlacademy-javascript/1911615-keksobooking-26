@@ -61,7 +61,7 @@ const cardTemplate = document.querySelector('#card');
  * Создает DOM Элемент с характеристиками объекта для сдачи.
  * @param {Ad} ad Объявление.
  */
-export function createCardNode({offer, author}) {
+function createCardNode({offer, author}) {
   const root = cardTemplate.content.cloneNode(true);
 
   // Аватарка
@@ -113,4 +113,6 @@ export function createCardNode({offer, author}) {
 
   return root;
 }
+
+export default createCardNode;
 

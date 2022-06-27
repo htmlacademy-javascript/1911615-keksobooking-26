@@ -109,7 +109,7 @@ const GUESTS_RANGE = [1, 10];
  * @param {number} id Число от 1 до 10
  * @return {Ad}
  */
-export const generateAd = (id) => {
+const generateAd = (id) => {
   /**
    * @type {AdLocation}
    */
@@ -153,5 +153,7 @@ export const generateAd = (id) => {
  * Сгенерирует список объявлений
  * @param {number} length Длина списка
  */
-export const generateAds = (length = 10) =>
+const generateAds = (length = 10) =>
   Array.from({length}, (item, index) => generateAd(index + 1));
+
+export default generateAds;

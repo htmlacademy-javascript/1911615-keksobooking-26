@@ -32,6 +32,7 @@ function removeModal() {
   }
 }
 
+
 export function createModal(target) {
   const fragment= target.content.cloneNode(true);
   const messageErrorButton = fragment.querySelector('.error__button');
