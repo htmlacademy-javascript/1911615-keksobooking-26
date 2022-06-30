@@ -1,6 +1,7 @@
 import createCardNode from './card-popup.js';
 import generateAds from './data.js';
 import createConstraints from './ad-constraints.js';
+// import createSlider from'./slider.js';
 
 // import {toggleDisabled} from './util.js';
 
@@ -10,7 +11,6 @@ const adForm = document.querySelector('.ad-form');
 // Добавляем ограничения на ввод данных
 
 createConstraints(adForm, {
-  classTo: 'ad-form__element',
   errorTextParent: 'ad-form__element',
   errorTextClass: 'ad-form__error',
 })
@@ -24,6 +24,8 @@ createConstraints(adForm, {
 
 const mapCanvas = document.querySelector('#map-canvas');
 mapCanvas.appendChild(createCardNode(generateAds()[0]));
+
+// createSlider();
 
 // toggleDisabled('ad-form', true);
 

@@ -5,15 +5,17 @@ Pristine.addMessages('ru', {
 });
 Pristine.setLocale('ru');
 
-
 /**
- * Подключит ограничения форме.
- * @param {Element} form Форма для наложения ограничений.
- * @param {object} pristineConfiguration Объект настроек конфигурации pristine.
+ * Вернет методы установки ограничений для формы размещения объявления.
+ * @param {HTMLFormElement} form Форма размещения объявления.
+ * @param {Object} options Настройки pristine.
  */
-function createConstraints (form, pristineConfiguration) {
-  const pristine = new Pristine(form, pristineConfiguration);
-  const fields = form.elements;
+function createConstraints(form, options) {
+
+  const pristine = new Pristine(form, {
+    classTo: options.errorTextParent,
+    ...options
+  });
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -22,51 +24,58 @@ function createConstraints (form, pristineConfiguration) {
       const [invalid] = pristine.getErrors();
       invalid.input.focus();
     } else {
+      // Триггер события "formdata".
       new FormData(form);
     }
   });
 
-  return {
+  form.addEventListener('reset', () => {
+    pristine.reset();
+  });
 
+  const fields = form.elements;
+
+  return {
     /**
-     * Задать минимальную длину поля "Заголовок".
+     * Установит ограничение минимальной длины заголовка.
      * @param {number} minLength
      */
-    setTitleMinLength: function(minLength) {
+    setTitleMinLength(minLength) {
       fields.title.minLength = minLength;
+
       pristine.addValidator(
         fields.title,
-        (titleValue) => titleValue.replace(/\s+/g, ' ').trim().length >= fields.title.minLength,
-        `Не менее ${fields.title.minLength} символов, не более 2-х пробелов подряд`
+        (titleValue) => titleValue.replace(/\s+/g, '').length >= minLength,
+        `Не менее ${minLength} символов`
       );
 
       return this;
     },
 
     /**
-     * Задать максимальную длину поля "Заголовок".
+     * Установит ограничение максимальной длины заголовка.
      * @param {number} maxLength
      */
-    setTitleMaxLength: function(maxLength) {
+    setTitleMaxLength(maxLength) {
       fields.title.maxLength = maxLength;
 
       return this;
     },
 
     /**
-     * Задать ограничения минимальной цены на основании объекта конфигурации
-     * @param {object} priceConfiguration Объект настроек цен в зависимости от типа жилья.
+     * Установит ограничение минимальной цены в зависимости от выбранного вида жилья.
+     * @param {Object<string, number>} priceByType
      */
-    setPriceMinValue: function(priceConfiguration) {
+    setPriceMinValue(priceByType) {
 
       pristine.addValidator(
         fields.price,
-        (priceValue) => priceValue >= priceConfiguration[fields.type.value],
-        () => `Не дешевле ${priceConfiguration[fields.type.value]}`
+        (priceValue) => priceValue >= priceByType[fields.type.value],
+        () => `Не дешевле ${priceByType[fields.type.value]}`
       );
 
       fields.type.addEventListener('change', (event) => {
-        fields.price.min = fields.price.placeholder = priceConfiguration[fields.type.value];
+        fields.price.min = fields.price.placeholder = priceByType[fields.type.value];
         pristine.validate(fields.price, !event.isTrusted);
       });
 
@@ -76,23 +85,24 @@ function createConstraints (form, pristineConfiguration) {
     },
 
     /**
-     * Задать ограничение максимальной цены.
+     * Установит ограничение максимальной цены.
      * @param {number} maxPrice
      */
-    setPriceMaxValue: function(maxPrice) {
+    setPriceMaxValue(maxPrice) {
       fields.price.max = maxPrice;
 
       return this;
     },
 
     /**
-     * Задать ограничение числа гостей.
+     * Установит ограничение минимального и максимального
+     * числа гостей в зависимости от количества комнат.
      */
-    setCapacity: function() {
-      const notForGuests = [...fields.rooms.options].pop().value;
+    setCapacity() {
+      const notForGuestsValue = [...fields.rooms.options].pop().value;
 
       pristine.addValidator(fields.guests, (guestsValue) =>{
-        if (fields.rooms.value === notForGuests) {
+        if (fields.rooms.value === notForGuestsValue) {
           return guestsValue === '0';
         }
         return true;
@@ -100,7 +110,7 @@ function createConstraints (form, pristineConfiguration) {
 
       pristine.addValidator(fields.guests, (guestsValue) =>{
         if (guestsValue === '0') {
-          return fields.rooms.value === notForGuests;
+          return fields.rooms.value === notForGuestsValue;
         }
         return true;
       }, 'Не менее 1');
@@ -119,18 +129,18 @@ function createConstraints (form, pristineConfiguration) {
     },
 
     /**
-     * Заблокировать поле адреса для ручного редактирования.
+     * Переведет поле адреса в состояние "Только для чтения".
      */
-    setAddressToReadOnly: function() {
+    setAddressToReadOnly() {
       fields.address.readOnly = true;
 
       return this;
     },
 
     /**
-     * Синхронизировать время заезда и выезда.
+     * Синхронизирует время заезда и выезда.
      */
-    syncCheckHours: function() {
+    syncCheckHours() {
       fields.checkin.addEventListener('change', () => {
         fields.checkout.value = fields.checkin.value;
       });
@@ -142,7 +152,6 @@ function createConstraints (form, pristineConfiguration) {
       return this;
     }
   };
-
 }
 
 export default createConstraints;
