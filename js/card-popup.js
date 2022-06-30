@@ -96,8 +96,8 @@ function formatCheckHours(checkin, checkout) {
 const cardTemplate = document.querySelector('#card');
 
 /**
- * Создает DOM Элемент с характеристиками объекта для сдачи.
- * @param {Ad} ad Объявление.
+ * Создаст DOM-узел карточки объявления.
+ * @param {Ad} ad
  */
 function createCardNode({offer, author}) {
   const root = cardTemplate.content.cloneNode(true);
