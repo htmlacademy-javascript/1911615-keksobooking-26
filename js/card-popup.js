@@ -91,19 +91,19 @@ function formatCheckHours(checkin, checkout) {
 }
 
 /**
- * @type {HTMLTemplateElement}
+ * @type {DocumentFragment}
  */
-const cardTemplate = document.querySelector('#card');
+const cardTemplateNode = document.querySelector('#card').content;
 
 /**
  * Создаст DOM-узел карточки объявления.
  * @param {Ad} ad
  */
 function createCardNode({offer, author}) {
-  const root = cardTemplate.content.cloneNode(true);
+  const rootNode = cardTemplateNode.querySelector('.popup').cloneNode(true);
 
   // Аватарка
-  root.querySelector('.popup__avatar').src = author.avatar;
+  rootNode.querySelector('.popup__avatar').src = author.avatar;
 
   // Текстовые элементы
   const textBySelector = {
@@ -117,7 +117,7 @@ function createCardNode({offer, author}) {
   };
 
   Object.keys(textBySelector).forEach((key) => {
-    const node = root.querySelector(key);
+    const node = rootNode.querySelector(key);
     if (textBySelector[key]) {
       node.textContent = textBySelector[key];
     } else {
@@ -126,28 +126,28 @@ function createCardNode({offer, author}) {
   });
 
   // Иконки удобств
-  const featuresRoot = root.querySelector('.popup__features');
+  const featuresRootNode = rootNode.querySelector('.popup__features');
   if (offer.features.length) {
     const selectors = offer.features.map((name) => `.popup__feature--${name}`);
-    featuresRoot.replaceChildren(...featuresRoot.querySelectorAll(selectors));
+    featuresRootNode.replaceChildren(...featuresRootNode.querySelectorAll(selectors));
   } else {
-    featuresRoot.remove();
+    featuresRootNode.remove();
   }
 
   // Фотографии
-  const photosRoot = root.querySelector('.popup__photos');
+  const photosRootNode = rootNode.querySelector('.popup__photos');
   if (offer.photos.length) {
-    const placeholderNode = root.querySelector('.popup__photo');
+    const placeholderNode = rootNode.querySelector('.popup__photo');
     const photosNode = offer.photos.map((src) => {
       const node = placeholderNode.cloneNode();
       return Object.assign(node, {src});
     });
-    photosRoot.replaceChildren(...photosNode);
+    photosRootNode.replaceChildren(...photosNode);
   } else {
-    photosRoot.remove();
+    photosRootNode.remove();
   }
 
-  return root;
+  return rootNode;
 }
 
 export default createCardNode;
