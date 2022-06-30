@@ -109,7 +109,7 @@ const GUESTS_RANGE = [1, 10];
  * @param {number} id Число от 1 до 10
  * @return {Ad}
  */
-const generateAd = (id) => {
+function generateAd(id) {
   /**
    * @type {AdLocation}
    */
@@ -122,7 +122,7 @@ const generateAd = (id) => {
    * @type {AdAuthor}
    */
   const author = {
-    avatar: `img/avatars/user${`${id}`.padStart(2, '0')}.png`
+    avatar: `img/avatars/user${String(id).padStart(2, '0')}.png`
   };
 
   /**
@@ -147,13 +147,14 @@ const generateAd = (id) => {
     offer,
     location
   };
-};
+}
 
 /**
  * Сгенерирует список объявлений
  * @param {number} length Длина списка
  */
-const generateAds = (length = 10) =>
-  Array.from({length}, (item, index) => generateAd(index + 1));
+function generateAds(length = 10) {
+  return Array.from({length}, (item, index) => generateAd(index + 1));
+}
 
 export default generateAds;
