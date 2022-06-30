@@ -4,7 +4,7 @@ import {
   getIntegerInRange,
   getItemsFromArray,
   getItemFromArray
-} from './util.js';
+} from './utilities.js';
 
 /**
  * Варианты заголовков.

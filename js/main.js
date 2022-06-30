@@ -1,9 +1,9 @@
-import createCardNode from './card-popup.js';
-import generateAds from './data.js';
+import createCardNode from './ad-card.js';
+import generateAds from './ad-generator.js';
 import createConstraints from './ad-constraints.js';
 // import createSlider from'./slider.js';
 
-// import {toggleDisabled} from './util.js';
+// import {toggleFormDisabled} from './util.js';
 
 const adForm = document.querySelector('.ad-form');
 
@@ -27,6 +27,6 @@ mapCanvas.appendChild(createCardNode(generateAds()[0]));
 
 // createSlider();
 
-// toggleDisabled('ad-form', true);
+// toggleFormDisabled('ad-form', true);
 
 
