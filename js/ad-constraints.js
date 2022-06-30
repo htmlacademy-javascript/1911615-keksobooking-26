@@ -1,106 +1,157 @@
 import '../pristine/pristine.min.js';
 
-//TODO Передавать "adForm" из main.js
-const adForm = document.querySelector('.ad-form');
-
-// Создание валидации формы
 Pristine.addMessages('ru', {
   required: 'Обязательное поле'
 });
-
 Pristine.setLocale('ru');
 
-const pristine = new Pristine(adForm, {
-  //TODO Передавать настройки pristine из main.js
-  classTo: 'ad-form__element',
-  errorTextParent: 'ad-form__element',
-  errorTextClass: 'ad-form__error',
-});
+/**
+ * Вернет методы установки ограничений для формы размещения объявления.
+ * @param {HTMLFormElement} form Форма размещения объявления.
+ * @param {Object} options Настройки pristine.
+ */
+function createConstraints(form, options) {
 
-// Валидация формы
-adForm.addEventListener('submit', (event) => {
-  event.preventDefault();
+  const pristine = new Pristine(form, {
+    classTo: options.errorTextParent,
+    ...options
+  });
 
-  if (!pristine.validate()) {
-    const [invalid] = pristine.getErrors();
-    invalid.input.focus();
-  } else {
-    new FormData(adForm);
-  }
-});
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
 
-const fields = adForm.elements;
+    if (!pristine.validate()) {
+      const [invalid] = pristine.getErrors();
+      invalid.input.focus();
+    } else {
+      // Триггер события "formdata".
+      new FormData(form);
+    }
+  });
 
-//TODO Возвращать объект с методами установки ограничений
+  form.addEventListener('reset', () => {
+    pristine.reset();
+  });
 
-// Валидация заголовка
-fields.title.minLength = 30;
-fields.title.maxLength = 100;
+  const fields = form.elements;
 
-pristine.addValidator(
-  fields.title,
-  (titleValue) => titleValue.replace(/\s+/g, ' ').trim().length >= fields.title.minLength,
-  `Не менее ${fields.title.minLength} символов, не более 2-х пробелов подряд`
-);
+  return {
+    /**
+     * Установит ограничение минимальной длины заголовка.
+     * @param {number} minLength
+     */
+    setTitleMinLength(minLength) {
+      fields.title.minLength = minLength;
 
-// Валидация цены
-fields.price.max = 100000;
+      pristine.addValidator(
+        fields.title,
+        (titleValue) => titleValue.replace(/\s+/g, '').length >= minLength,
+        `Не менее ${minLength} символов`
+      );
 
-const priceByType = {
-  palace: 10000,
-  flat: 1000,
-  house: 5000,
-  bungalow: 0,
-  hotel: 3000,
-};
+      return this;
+    },
 
-pristine.addValidator(
-  fields.price,
-  (priceValue) => priceValue >= priceByType[fields.type.value],
-  () => `Не дешевле ${priceByType[fields.type.value]}`
-);
+    /**
+     * Установит ограничение максимальной длины заголовка.
+     * @param {number} maxLength
+     */
+    setTitleMaxLength(maxLength) {
+      fields.title.maxLength = maxLength;
 
-fields.type.addEventListener('change', (event) => {
-  fields.price.min = fields.price.placeholder = priceByType[fields.type.value];
-  pristine.validate(fields.price, !event.isTrusted);
-});
+      return this;
+    },
 
-fields.type.dispatchEvent(new Event('change'));
+    /**
+     * Установит ограничение минимальной цены в зависимости от выбранного вида жилья.
+     * @param {Object<string, number>} priceByType
+     */
+    setPriceMinValue(priceByType) {
 
+      pristine.addValidator(
+        fields.price,
+        (priceValue) => priceValue >= priceByType[fields.type.value],
+        () => `Не дешевле ${priceByType[fields.type.value]}`
+      );
 
-// Валидация количества комнат и жильцов
-const notForGuests = [...fields.rooms.options].pop().value;
+      fields.type.addEventListener('change', (event) => {
+        fields.price.min = fields.price.placeholder = priceByType[fields.type.value];
+        pristine.validate(fields.price, !event.isTrusted);
+      });
 
-pristine.addValidator(fields.guests, (guestsValue) =>{
-  if (fields.rooms.value === notForGuests) {
-    return guestsValue === '0';
-  }
-  return true;
-}, 'Не для гостей', 1, true);
+      fields.type.dispatchEvent(new Event('change'));
 
-pristine.addValidator(fields.guests, (guestsValue) =>{
-  if (guestsValue === '0') {
-    return fields.rooms.value === notForGuests;
-  }
-  return true;
-}, 'Не менее 1');
+      return this;
+    },
 
-pristine.addValidator(
-  fields.guests,
-  (guestsValue) => guestsValue <= fields.rooms.value,
-  () => `Не более ${fields.rooms.value}`
-);
+    /**
+     * Установит ограничение максимальной цены.
+     * @param {number} maxPrice
+     */
+    setPriceMaxValue(maxPrice) {
+      fields.price.max = maxPrice;
 
-fields.rooms.addEventListener('change', () => {
-  pristine.validate(fields.guests);
-});
+      return this;
+    },
 
-// Синхронизация часов заселения
-fields.checkin.addEventListener('change', () => {
-  fields.checkout.value = fields.checkin.value;
-});
+    /**
+     * Установит ограничение минимального и максимального
+     * числа гостей в зависимости от количества комнат.
+     */
+    setCapacity() {
+      const notForGuestsValue = [...fields.rooms.options].pop().value;
 
-fields.checkout.addEventListener('change', () => {
-  fields.checkin.value = fields.checkout.value;
-});
+      pristine.addValidator(fields.guests, (guestsValue) =>{
+        if (fields.rooms.value === notForGuestsValue) {
+          return guestsValue === '0';
+        }
+        return true;
+      }, 'Не для гостей', 1, true);
 
+      pristine.addValidator(fields.guests, (guestsValue) =>{
+        if (guestsValue === '0') {
+          return fields.rooms.value === notForGuestsValue;
+        }
+        return true;
+      }, 'Не менее 1');
+
+      pristine.addValidator(
+        fields.guests,
+        (guestsValue) => guestsValue <= fields.rooms.value,
+        () => `Не более ${fields.rooms.value}`
+      );
+
+      fields.rooms.addEventListener('change', () => {
+        pristine.validate(fields.guests);
+      });
+
+      return this;
+    },
+
+    /**
+     * Переведет поле адреса в состояние "Только для чтения".
+     */
+    setAddressToReadOnly() {
+      fields.address.readOnly = true;
+
+      return this;
+    },
+
+    /**
+     * Синхронизирует время заезда и выезда.
+     */
+    syncCheckHours() {
+      fields.checkin.addEventListener('change', () => {
+        fields.checkout.value = fields.checkin.value;
+      });
+
+      fields.checkout.addEventListener('change', () => {
+        fields.checkin.value = fields.checkout.value;
+      });
+
+      return this;
+    }
+  };
+}
+
+export default createConstraints;
