@@ -1,22 +1,38 @@
 import './ad.js';
 
+/**
+ * Правило множественности.
+ */
 const pluralRules = new Intl.PluralRules('ru');
 
-const pluralsForGuests = new Map ([
-  ['one', 'гостя'],
-  ['few', 'гостей'],
-  ['many', 'гостей'],
-  ['other', 'гостей']
-]);
+/**
+ * Формат чисел.
+ */
+const numberFormat = new Intl.NumberFormat('ru');
 
-const roomsUnitByRule = new Map ([
-  ['one', 'комната'],
-  ['few', 'комнаты'],
-  ['many', 'комнат'],
-  ['other', 'комнат']
-]);
+/**
+ * Словарь количества гостей.
+ */
+const guestsUnitByRule = {
+  one: 'гостя',
+  few: 'гостей',
+  many: 'гостей',
+  other: 'гостей'
+};
 
-export const offerNameByType = {
+/**
+ * Словарь количества комнат.
+ */
+const roomsUnitByRule = {
+  one: 'комната',
+  few: 'комнаты',
+  many: 'комнат',
+};
+
+/**
+ * Словарь видов жилья.
+ */
+const offerNameByType = {
   palace: 'Дворец',
   flat: 'Квартира',
   house: 'Дом',
@@ -25,22 +41,44 @@ export const offerNameByType = {
 };
 
 /**
- * Форматирует стоимость объявления.
- * @param {number} value Стоимость аренды.
+ * Вернет строку вида жилья.
+ * @param {string} type
  */
-function formatPrice(value) {
-  return `${value.toLocaleString('ru')} <span> ₽/ночь</span>`;
+function formatOfferType(type) {
+  return offerNameByType[type] || '';
 }
 
 /**
- * Форматирует количество комнат и гостей.
- * @param {number} rooms Количество комнат.
- * @param {number} guests Количество гостей.
+ * Вернет строку стоимости жилья.
+ * @param {number} price
+ */
+function formatPrice(price) {
+  return numberFormat.format(price);
+}
+
+/**
+ * Вернет строку количества комнат.
+ * @param {number} rooms
+ */
+function formatRooms(rooms) {
+  return `${rooms} ${roomsUnitByRule[pluralRules.select(rooms)]}`;
+}
+
+/**
+ * Вернет строку количества гостей.
+ * @param {number} guests
+ */
+function formatGuests(guests) {
+  return `${guests} ${guestsUnitByRule[pluralRules.select(guests)]}`;
+}
+
+/**
+ * Вернет строку вместительности жилья.
+ * @param {number} rooms
+ * @param {number} guests
  */
 function formatCapacity(rooms, guests) {
-  const roomsEnding = roomsUnitByRule.get(pluralRules.select(rooms));
-  const guestsEnding = pluralsForGuests.get(pluralRules.select(guests));
-  return `${rooms} ${roomsEnding} для ${guests} ${guestsEnding}`;
+  return `${formatRooms(rooms)} для ${formatGuests(guests)}`;
 }
 
 /**
@@ -71,8 +109,8 @@ function createCardNode({offer, author}) {
   const textBySelector = {
     '.popup__title': offer.title,
     '.popup__text--address': offer.address,
-    '.popup__text--price': formatPrice(offer.price),
-    '.popup__type': offerNameByType[offer.type],
+    '.popup__text--price span': formatPrice(offer.price),
+    '.popup__type': formatOfferType(offer.type),
     '.popup__text--capacity': formatCapacity(offer.rooms, offer.guests),
     '.popup__text--time': formatCheckHours(offer.checkin, offer.checkout),
     '.popup__description': offer.description
@@ -81,19 +119,17 @@ function createCardNode({offer, author}) {
   Object.keys(textBySelector).forEach((key) => {
     const node = root.querySelector(key);
     if (textBySelector[key]) {
-      const propertyName = key.endsWith('price') ? 'innerHTML' : 'textContent';
-      node[propertyName] = textBySelector[key];
+      node.textContent = textBySelector[key];
     } else {
       node.remove();
     }
   });
 
-  //Иконки удобств
+  // Иконки удобств
   const featuresRoot = root.querySelector('.popup__features');
   if (offer.features.length) {
     const selectors = offer.features.map((name) => `.popup__feature--${name}`);
-    const featureNodes = featuresRoot.querySelectorAll(selectors.join(',') || null);
-    featuresRoot.replaceChildren(...featureNodes);
+    featuresRoot.replaceChildren(...featuresRoot.querySelectorAll(selectors));
   } else {
     featuresRoot.remove();
   }
