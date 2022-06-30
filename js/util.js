@@ -59,9 +59,11 @@ export function getItemsFromArray(items) {
 }
 
 /**
- * Переключает активность состояния формы.
+ * Переключает активное состояние формы.
+ * @param {string} className
+ * @param {boolean} isDisabled
  */
-export function toggleDisabled (className, isDisabled){
+export function toggleFormDisabled(className, isDisabled) {
   const form = document.querySelector(`.${className}`);
   form.classList.toggle(`${className}--disabled`, isDisabled);
   [...form.elements].forEach((node) => (node.disabled = isDisabled));
