@@ -91,6 +91,12 @@ function createConstraints(form, options) {
     setPriceMaxValue(maxPrice) {
       fields.price.max = maxPrice;
 
+      pristine.addValidator(
+        fields.price,
+        (priceValue) => priceValue <= maxPrice,
+        `Не дороже ${maxPrice}`
+      );
+
       return this;
     },
 
