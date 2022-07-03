@@ -1,15 +1,32 @@
+import {toggleFormDisabled} from './utilities.js';
+import createCardNode from './ad-card.js';
 
-const adForm = document.querySelector('.ad-form');
-const fields = adForm.elements;
+/**
+ * Местоположение центра города
+ * @typedef cityCentre
+ * @prop {number} lat Широта
+ * @prop {number} lng Долгота
+ */
 
 /**
  * Создает карту
  * @param {string} idName id контейнера для карты.
- * @param {boolean} cityCentre Координаты центра города.
+ * @param {cityCentre} cityCentre
  */
-function createMap(idName, cityCentre) {
+function createMap(idName, cityCentre, form) {
+  toggleFormDisabled('ad-form', true);
+  toggleFormDisabled('map__filters', true);
+
+  const fields = form.elements;
   const map = L.map(idName)
-    .setView(cityCentre, 10);
+    .on('load', () => {
+      toggleFormDisabled('ad-form', false);
+      toggleFormDisabled('map__filters', false);
+      form.addEventListener('reset', () => {
+        map.setView(cityCentre, 13);
+      });
+    })
+    .setView(cityCentre, 13);
 
   L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -18,6 +35,23 @@ function createMap(idName, cityCentre) {
     },
   ).addTo(map);
 
+  function createAdPin(iconOptions, ad) {
+    const adsGroup = L.layerGroup().addTo(map);
+    const adPinIcon = L.icon(iconOptions);
+    const adPin = L.marker(
+      ad.location,
+      {icon: adPinIcon},
+    );
+    adPin
+      .addTo(adsGroup)
+      .bindPopup(createCardNode(ad));
+
+    form.addEventListener('reset', () => {
+      if (adPin.isPopupOpen()) {
+        adPin.closePopup();
+      }
+    });
+  }
 
   return {
     createMainPin(iconOptions) {
@@ -34,9 +68,16 @@ function createMap(idName, cityCentre) {
         const location = event.target.getLatLng();
         fields.address.value = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
       });
-      adForm.addEventListener('reset', () => {
+      form.addEventListener('reset', () => {
         mainPin.setLatLng(cityCentre);
-        map.setView(cityCentre, 10);
+      });
+
+      return this;
+    },
+
+    createAdPins(iconOptions, ads) {
+      ads.forEach((ad) => {
+        createAdPin(iconOptions, ad);
       });
 
       return this;
