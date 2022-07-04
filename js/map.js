@@ -1,89 +1,86 @@
-import {toggleFormDisabled} from './utilities.js';
-import createCardNode from './ad-card.js';
-
 /**
- * Местоположение центра города
- * @typedef cityCentre
- * @prop {number} lat Широта
- * @prop {number} lng Долгота
+ * Рисует карту и главную метку.
+ * @param {string} containerId
+ * @param {cityCentre} options
  */
+function renderMap(containerId, options) {
+  /**
+   * Изображение главной метки.
+   */
+  const primaryPinIcon = L.icon({
+    iconUrl: './img/main-pin.svg',
+    iconSize: [52, 52],
+    iconAnchor: [26, 52]
+  });
 
-/**
- * Создает карту
- * @param {string} idName id контейнера для карты.
- * @param {cityCentre} cityCentre
- */
-function createMap(idName, cityCentre, form) {
-  toggleFormDisabled('ad-form', true);
-  toggleFormDisabled('map__filters', true);
+  /**
+   * Главная метка.
+   */
+  const primaryPin = L.marker(options.center, {
+    icon: primaryPinIcon,
+    draggable: true,
+    autoPan: true,
+    zIndexOffset: 1000,
+  });
 
-  const fields = form.elements;
-  const map = L.map(idName)
-    .on('load', () => {
-      toggleFormDisabled('ad-form', false);
-      toggleFormDisabled('map__filters', false);
-      form.addEventListener('reset', () => {
-        map.setView(cityCentre, 13);
-      });
-    })
-    .setView(cityCentre, 13);
+  /**
+   * Изображение второстепенной метки.
+   */
+  const secondaryPinIcon = L.icon({
+    iconUrl: './img/pin.svg',
+    iconSize: [40, 40],
+    iconAnchor: [20, 40]
+  });
 
-  L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    },
-  ).addTo(map);
+  /**
+   * Группа второстепенных меток.
+   */
+  const secondaryPinGroup = L.layerGroup();
 
-  function createAdPin(iconOptions, ad) {
-    const adsGroup = L.layerGroup().addTo(map);
-    const adPinIcon = L.icon(iconOptions);
-    const adPin = L.marker(
-      ad.location,
-      {icon: adPinIcon},
-    );
-    adPin
-      .addTo(adsGroup)
-      .bindPopup(createCardNode(ad));
+  /**
+   * Картографический слой.
+   */
+  const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
 
-    form.addEventListener('reset', () => {
-      if (adPin.isPopupOpen()) {
-        adPin.closePopup();
-      }
-    });
-  }
+  /**
+   * Карта.
+   */
+  const map = L.map(containerId, {
+    layers: [tileLayer, primaryPin, secondaryPinGroup],
+    zoom: 13,
+    attributionControl: false,
+    scrollWheelZoom: false,
+    ...options
+  });
 
   return {
-    createMainPin(iconOptions) {
-      const mainPinIcon = L.icon(iconOptions);
-      const mainPin = L.marker(
-        cityCentre,
-        {
-          draggable: true,
-          icon: mainPinIcon,
-        },
-      );
-      mainPin.addTo(map);
-      mainPin.on('moveend', (event) => {
-        const location = event.target.getLatLng();
-        fields.address.value = `${location.lat.toFixed(6)}, ${location.lng.toFixed(6)}`;
-      });
-      form.addEventListener('reset', () => {
-        mainPin.setLatLng(cityCentre);
-      });
+    primaryPin,
+    tileLayer,
 
-      return this;
+    /**
+     * Добавит второстепенную метку.
+     * @param {Object} location
+     * @param {HTMLElement} popup
+     */
+    addSecondaryPin(location, popup) {
+      const secondaryPin = L.marker(location, {
+        icon: secondaryPinIcon
+      });
+      secondaryPin.bindPopup(popup);
+      secondaryPinGroup.addLayer(secondaryPin);
     },
 
-    createAdPins(iconOptions, ads) {
-      ads.forEach((ad) => {
-        createAdPin(iconOptions, ad);
-      });
-
-      return this;
-    }
+    /**
+     * Сбросит местоположение и масштаб до первоначальных значений.
+     */
+    resetView() {
+      const {center, zoom} = map.options;
+      map.setView(center, zoom);
+      primaryPin.setLatLng(center);
+      secondaryPinGroup.eachLayer((pin) => pin.closePopup());
+    },
   };
 }
 
-export default createMap;
+export default renderMap;
 

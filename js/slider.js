@@ -1,42 +1,36 @@
 import '../nouislider/nouislider.js';
 
-function createSlider(){
-  const adForm = document.querySelector('.ad-form');
-  const sliderElement = document.querySelector('.ad-form__slider');
-  const fields = adForm.elements;
-  noUiSlider.create(sliderElement, {
+/**
+ * Создаст ползунок на DOM-элементе `element` и синхронизирует его с `options.inputElement`
+ * @param {HTMLElement} element
+ * @param {Object} options
+ */
+function createRangeSlider(element, options) {
+  const {inputElement} = options;
+
+  const rangeSlider = noUiSlider.create(element, {
+    start: inputElement.value,
     range: {
-      min: Number(fields.price.min),
-      max: Number(fields.price.max),
+      min: 0,
+      max: Number(inputElement.max),
     },
-    start: Number(fields.price.min),
-    step: 1,
+    step: Number(inputElement.step),
+    behaviour: 'snap',
     connect: 'lower',
-    format: {
-      to: function (value) {
-        return value;
-      },
-      from: function (value) {
-        return parseFloat(value);
-      },
-    },
+    animate: false,
+    ...options
   });
 
-  sliderElement.noUiSlider.on('update', () => {
-    fields.price.value = sliderElement.noUiSlider.get();
+  rangeSlider.on('slide', (values) => {
+    inputElement.value = Number(...values);
+    inputElement.dispatchEvent(new Event('input'));
   });
 
-  fields.type.addEventListener('change', () => {
-    sliderElement.noUiSlider.updateOptions({
-      range: {
-        min: Number(fields.price.min),
-        max: Number(fields.price.max),
-      },
-      start: Number(fields.price.min),
-      step: 1,
-      connect: 'lower',
-    });
+  inputElement.addEventListener('input', () => {
+    rangeSlider.set(inputElement.value);
   });
+
+  return rangeSlider;
 }
 
-export default createSlider;
+export default createRangeSlider;

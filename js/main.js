@@ -1,12 +1,18 @@
 import generateAds from './ad-generator.js';
 import createConstraints from './ad-constraints.js';
-import createMap from './map.js';
-// import createSlider from'./slider.js';
+import renderMap from './map.js';
+import createCardNode from './ad-card.js';
+import {toggleFormDisabled} from './utilities.js';
+import createRangeSlider from'./slider.js';
+
+// Деактивация форм.
 
 const adForm = document.querySelector('.ad-form');
 
+toggleFormDisabled('ad-form', true);
+toggleFormDisabled('map__filters', true);
 
-// Добавляем ограничения на ввод данных
+// Ограничения на ввод данных.
 
 createConstraints(adForm, {
   errorTextParent: 'ad-form__element',
@@ -14,18 +20,45 @@ createConstraints(adForm, {
 })
   .setTitleMinLength(30)
   .setTitleMaxLength(100)
-  .setPriceMinValue({palace: 10000, flat: 1000, house: 5000, bungalow: 0, hotel: 3000})
+  .setPriceMinValue({bungalow: 0, flat: 1000, hotel: 3000, house: 5000, palace: 10000})
   .setPriceMaxValue(100000)
+  .setPriceStep(1000)
   .setCapacity()
   .setAddressToReadOnly()
   .syncCheckHours();
 
-// Добавляем карту
+// Альтернативный способ указать цену.
 
-createMap('map-canvas', {lat: 35.681729, lng: 139.753927,}, adForm)
-  .createMainPin({iconUrl: './img/main-pin.svg', iconSize: [52, 52], iconAnchor: [26, 52],})
-  .createAdPins({iconUrl: './img/pin.svg', iconSize: [40, 40], iconAnchor: [20, 40],}, generateAds());
+createRangeSlider(document.querySelector('.ad-form__slider'),{
+  inputElement: adForm.price,
+});
 
-// createSlider();
+// Карта и метки.
 
+const map = renderMap('map-canvas', {
+  center: [35.681729, 139.753927],
+});
+
+generateAds().forEach((ad) => {
+  map.addSecondaryPin(ad.location, createCardNode(ad));
+});
+
+// Запись координат главной метки в поле адреса.
+
+map.primaryPin.on('move', () => {
+  const {lat, lng} = map.primaryPin.getLatLng();
+  adForm.address.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+});
+map.primaryPin.fire('move');
+
+adForm.addEventListener('reset', () => {
+  requestAnimationFrame(() => map.resetView());
+});
+
+// Активация форм.
+
+map.tileLayer.on('load', () => {
+  toggleFormDisabled('ad-form', false);
+  toggleFormDisabled('map__filters', false);
+});
 

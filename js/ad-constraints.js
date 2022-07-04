@@ -101,6 +101,16 @@ function createConstraints(form, options) {
     },
 
     /**
+     * Установит шаг цены.
+     * @param {number} step
+     */
+    setPriceStep(step) {
+      fields.price.step = step;
+
+      return this;
+    },
+
+    /**
      * Установит ограничение минимального и максимального
      * числа гостей в зависимости от количества комнат.
      */
