@@ -3,7 +3,7 @@ import createConstraints from './ad-constraints.js';
 import renderMap from './map.js';
 import createCardNode from './ad-card.js';
 import {toggleFormDisabled} from './utilities.js';
-import createRangeSlider from'./slider.js';
+import createRangeSlider from'./range-slider.js';
 
 // Деактивация форм.
 
