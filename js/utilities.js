@@ -68,3 +68,8 @@ export function toggleFormDisabled(className, isDisabled) {
   form.classList.toggle(`${className}--disabled`, isDisabled);
   [...form.elements].forEach((node) => (node.disabled = isDisabled));
 }
+
+
+export function toggleButtonDisabled(element, isDisabled) {
+  element.disabled = isDisabled;
+}

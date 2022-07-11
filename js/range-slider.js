@@ -5,7 +5,7 @@ import '../nouislider/nouislider.js';
  * @param {HTMLElement} element
  * @param {Object} options
  */
-function createRangeSlider(element, options) {
+function renderRangeSlider(element, options) {
   const {inputElement} = options;
 
   const rangeSlider = noUiSlider.create(element, {
@@ -33,4 +33,4 @@ function createRangeSlider(element, options) {
   return rangeSlider;
 }
 
-export default createRangeSlider;
+export default renderRangeSlider;

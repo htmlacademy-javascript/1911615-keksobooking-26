@@ -1,9 +1,11 @@
-import generateAds from './ad-generator.js';
+import {toggleFormDisabled, toggleButtonDisabled} from './utilities.js';
 import createConstraints from './ad-constraints.js';
 import renderMap from './map.js';
 import createCardNode from './ad-card.js';
-import {toggleFormDisabled} from './utilities.js';
-import createRangeSlider from'./range-slider.js';
+import renderRangeSlider from'./range-slider.js';
+import {getData, sendData} from './requests.js';
+import showAlert from './alert.js';
+import { createModal, successMessageElement, errorMessageElement} from './modal.js';
 
 // Деактивация форм.
 
@@ -29,7 +31,7 @@ createConstraints(adForm, {
 
 // Альтернативный способ указать цену.
 
-createRangeSlider(document.querySelector('.ad-form__slider'),{
+renderRangeSlider(document.querySelector('.ad-form__slider'),{
   inputElement: adForm.price,
 });
 
@@ -39,9 +41,19 @@ const map = renderMap('map-canvas', {
   center: [35.681729, 139.753927],
 });
 
-generateAds().forEach((ad) => {
-  map.addSecondaryPin(ad.location, createCardNode(ad));
-});
+// const MAX_ADS_AT_TIME = 10;
+
+getData(
+  'https://26.javascript.pages.academy/keksobooking/data',
+  (ads) => {
+    console.log(ads);
+    ads.forEach((ad) => {
+      map.addSecondaryPin(ad.location, createCardNode(ad));
+    });
+    toggleFormDisabled('map__filters', false);
+  },
+  showAlert
+);
 
 // Запись координат главной метки в поле адреса.
 
@@ -59,6 +71,24 @@ adForm.addEventListener('reset', () => {
 
 map.tileLayer.on('load', () => {
   toggleFormDisabled('ad-form', false);
-  toggleFormDisabled('map__filters', false);
+});
+
+// Отправка данных
+
+adForm.addEventListener('formdata', (event) => {
+  toggleButtonDisabled(adForm.submit, true);
+  sendData(
+    'https://26.javascript.pages.academy/keksobooking',
+    event.formData,
+    () => {
+      createModal(successMessageElement);
+      toggleButtonDisabled(adForm.submit, false);
+      adForm.reset();
+    },
+    () => {
+      createModal(errorMessageElement);
+      toggleButtonDisabled(adForm.submit, false);
+    }
+  );
 });
 

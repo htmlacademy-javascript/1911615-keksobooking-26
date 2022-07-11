@@ -9,19 +9,6 @@ const onPopupEscKeydown = (evt) => {
   }
 };
 
-// export function createModal(target) {
-
-//   return {
-//     open() {
-
-//     },
-//     close() {
-
-//     }
-//   };
-// }
-
-
 // Сообщения об ошибке/успехе валидации
 
 function removeModal() {
@@ -31,7 +18,6 @@ function removeModal() {
     mainBody.removeChild(target);
   }
 }
-
 
 export function createModal(target) {
   const fragment= target.content.cloneNode(true);
