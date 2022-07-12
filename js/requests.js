@@ -1,44 +1,41 @@
-export function getData(url, onSuccess, onError) {
-  fetch(
-    url,
-    {
-      method: 'GET',
-    },
-  )
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
+/**
+ * Базовый адрес для отправки запросов.
+ */
+const BASE_URL = 'https://26.javascript.pages.academy/keksobooking';
 
-      throw new Error();
-    })
-    .then((data) => {
-      onSuccess(data);
-    })
-    .catch(() => {
-      onError('Не удалось получить данные с сервера');
-    });
+/**
+ * Создаст запрос на сервер
+ * @param {string} path Относительный путь запроса
+ * @param {Object} options
+ */
+function request(path, options) {
+  return fetch(BASE_URL + path, options).then((response) => {
+    if (!response.ok) {
+      throw response;
+    }
+    return response.json();
+  });
 }
 
-export function sendData(url, body, onSuccess, onError) {
-  fetch(
-    url,
-    {
-      method: 'POST',
-      body,
-    },
-  )
-    .then((response) => {
-      if (response.ok) {
-        return response.json();
-      }
-
-      throw new Error();
-    })
-    .then(() => {
-      onSuccess();
-    })
-    .catch(() => {
-      onError();
-    });
+/**
+ * Получит список объявлений
+ * @returns {Promise<Ad[]>}
+ */
+export function getAds() {
+  return request('/data', {
+    method: 'get',
+    cache: 'force-cache'
+  });
 }
+
+/**
+ * Передаст объявление
+ * @param {FormData} data
+ */
+export function postAd(data) {
+  return request('/', {
+    method: 'POST',
+    body: data,
+  });
+}
+

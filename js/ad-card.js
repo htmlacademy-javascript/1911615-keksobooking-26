@@ -127,24 +127,26 @@ function createCardNode({offer, author}) {
 
   // Иконки удобств
   const featuresRootNode = rootNode.querySelector('.popup__features');
-  if (offer.features.length) {
+  if (offer.features === undefined || !offer.features.length) {
+    featuresRootNode.remove();
+  }
+  else {
     const selectors = offer.features.map((name) => `.popup__feature--${name}`);
     featuresRootNode.replaceChildren(...featuresRootNode.querySelectorAll(selectors));
-  } else {
-    featuresRootNode.remove();
   }
 
   // Фотографии
   const photosRootNode = rootNode.querySelector('.popup__photos');
-  if (offer.photos.length) {
+  if (offer.photos === undefined || !offer.photos.length) {
+    photosRootNode.remove();
+  }
+  else {
     const placeholderNode = rootNode.querySelector('.popup__photo');
     const photosNode = offer.photos.map((src) => {
       const node = placeholderNode.cloneNode();
       return Object.assign(node, {src});
     });
     photosRootNode.replaceChildren(...photosNode);
-  } else {
-    photosRootNode.remove();
   }
 
   return rootNode;

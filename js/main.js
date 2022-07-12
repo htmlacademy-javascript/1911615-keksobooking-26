@@ -1,11 +1,11 @@
 import {toggleFormDisabled, toggleButtonDisabled} from './utilities.js';
 import createConstraints from './ad-constraints.js';
+import { setDropZone, setPhotosPreview } from './photos.js';
 import renderMap from './map.js';
 import createCardNode from './ad-card.js';
 import renderRangeSlider from'./range-slider.js';
-import {getData, sendData} from './requests.js';
-import showAlert from './alert.js';
-import { createModal, successMessageElement, errorMessageElement} from './modal.js';
+import {getAds, postAd} from './requests.js';
+import showMessage from './modal.js';
 
 // Деактивация форм.
 
@@ -29,6 +29,27 @@ createConstraints(adForm, {
   .setAddressToReadOnly()
   .syncCheckHours();
 
+// Установка предпросмотра изображений
+setDropZone(
+  document.querySelector('.ad-form-header__drop-zone'),
+  document.querySelector('#avatar')
+);
+
+setPhotosPreview(
+  document.querySelector('#avatar'),
+  document.querySelector('.ad-form-avatar')
+);
+
+setDropZone(
+  document.querySelector('.ad-form__drop-zone'),
+  document.querySelector('#images')
+);
+
+setPhotosPreview(
+  document.querySelector('#images'),
+  document.querySelector('.ad-form-photo')
+);
+
 // Альтернативный способ указать цену.
 
 renderRangeSlider(document.querySelector('.ad-form__slider'),{
@@ -41,19 +62,19 @@ const map = renderMap('map-canvas', {
   center: [35.681729, 139.753927],
 });
 
-// const MAX_ADS_AT_TIME = 10;
+const MAX_ADS_AT_TIME = 10;
 
-getData(
-  'https://26.javascript.pages.academy/keksobooking/data',
-  (ads) => {
-    console.log(ads);
-    ads.forEach((ad) => {
+(async function() {
+  try {
+    const ads = await getAds();
+    ads.slice(0, MAX_ADS_AT_TIME).forEach((ad) => {
       map.addSecondaryPin(ad.location, createCardNode(ad));
     });
     toggleFormDisabled('map__filters', false);
-  },
-  showAlert
-);
+  } catch (exception) {
+    showMessage('error',`Ошибка: ${exception.status || exception.message}`);
+  }
+})();
 
 // Запись координат главной метки в поле адреса.
 
@@ -75,20 +96,16 @@ map.tileLayer.on('load', () => {
 
 // Отправка данных
 
-adForm.addEventListener('formdata', (event) => {
+adForm.addEventListener('formdata', async (event) => {
   toggleButtonDisabled(adForm.submit, true);
-  sendData(
-    'https://26.javascript.pages.academy/keksobooking',
-    event.formData,
-    () => {
-      createModal(successMessageElement);
-      toggleButtonDisabled(adForm.submit, false);
-      adForm.reset();
-    },
-    () => {
-      createModal(errorMessageElement);
-      toggleButtonDisabled(adForm.submit, false);
-    }
-  );
+  try {
+    await postAd(event.formData);
+    showMessage('success');
+    adForm.reset();
+  } catch(response) {
+    showMessage('error');
+  }
+  toggleButtonDisabled(adForm.submit, false);
 });
+
 
