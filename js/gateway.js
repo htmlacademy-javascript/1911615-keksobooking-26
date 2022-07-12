@@ -4,7 +4,7 @@
 const BASE_URL = 'https://26.javascript.pages.academy/keksobooking';
 
 /**
- * Создаст запрос на сервер
+ * Отправит запрос на сервер
  * @param {string} path Относительный путь запроса
  * @param {Object} options
  */
@@ -35,7 +35,7 @@ export function getAds() {
 export function postAd(data) {
   return request('/', {
     method: 'POST',
-    body: data,
+    body: data
   });
 }
 

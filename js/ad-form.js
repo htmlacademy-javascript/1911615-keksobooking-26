@@ -16,8 +16,9 @@ function initAdForm() {
    * Ограничения на ввод данных.
    */
   createConstraints(adFormElement, {
+    classTo: 'ad-form__element',
     errorTextParent: 'ad-form__element',
-    errorTextClass: 'ad-form__error',
+    errorTextClass: 'ad-form__error'
   })
     .setTitleMinLength(30)
     .setTitleMaxLength(100)

@@ -2,7 +2,7 @@ import renderMap from './map.js';
 import initMapForm from './map-form.js';
 import initAdForm from './ad-form.js';
 import {getAds, postAd} from './gateway.js';
-import showMessage from './modal.js';
+import showMessage from './message.js';
 
 const map = renderMap({
   center: [35.681729, 139.753927],

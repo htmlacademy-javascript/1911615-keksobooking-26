@@ -7,14 +7,10 @@ Pristine.setLocale('ru');
 /**
  * Вернет методы установки ограничений для формы размещения объявления.
  * @param {HTMLFormElement} formElement Форма размещения объявления.
- * @param {Object} options Настройки pristine.
+ * @param {Object} options Настройки Pristine.
  */
 function createConstraints(formElement, options) {
-
-  const pristine = new Pristine(formElement, {
-    classTo: options.errorTextParent,
-    ...options
-  });
+  const pristine = new Pristine(formElement, options);
 
   formElement.addEventListener('submit', (event) => {
     event.preventDefault();
