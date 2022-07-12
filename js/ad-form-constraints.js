@@ -1,23 +1,18 @@
 import '../pristine/pristine.min.js';
+import {formatGuests} from './format.js';
 
-Pristine.addMessages('ru', {
-  required: 'Обязательное поле'
-});
+Pristine.addMessages('ru', {required: 'Обязательное поле'});
 Pristine.setLocale('ru');
 
 /**
  * Вернет методы установки ограничений для формы размещения объявления.
- * @param {HTMLFormElement} form Форма размещения объявления.
- * @param {Object} options Настройки pristine.
+ * @param {HTMLFormElement} formElement Форма размещения объявления.
+ * @param {Object} options Настройки Pristine.
  */
-function createConstraints(form, options) {
+function createConstraints(formElement, options) {
+  const pristine = new Pristine(formElement, options);
 
-  const pristine = new Pristine(form, {
-    classTo: options.errorTextParent,
-    ...options
-  });
-
-  form.addEventListener('submit', (event) => {
+  formElement.addEventListener('submit', (event) => {
     event.preventDefault();
 
     if (!pristine.validate()) {
@@ -25,15 +20,13 @@ function createConstraints(form, options) {
       invalid.input.focus();
     } else {
       // Триггер события "formdata".
-      new FormData(form);
+      new FormData(formElement);
     }
   });
 
-  form.addEventListener('reset', () => {
+  formElement.addEventListener('reset', () => {
     pristine.reset();
   });
-
-  const fields = form.elements;
 
   return {
     /**
@@ -41,10 +34,10 @@ function createConstraints(form, options) {
      * @param {number} minLength
      */
     setTitleMinLength(minLength) {
-      fields.title.minLength = minLength;
+      formElement.title.minLength = minLength;
 
       pristine.addValidator(
-        fields.title,
+        formElement.title,
         (titleValue) => titleValue.replace(/\s+/g, '').length >= minLength,
         `Не менее ${minLength} символов`
       );
@@ -57,7 +50,7 @@ function createConstraints(form, options) {
      * @param {number} maxLength
      */
     setTitleMaxLength(maxLength) {
-      fields.title.maxLength = maxLength;
+      formElement.title.maxLength = maxLength;
 
       return this;
     },
@@ -67,19 +60,26 @@ function createConstraints(form, options) {
      * @param {Object<string, number>} priceByType
      */
     setPriceMinValue(priceByType) {
-
       pristine.addValidator(
-        fields.price,
-        (priceValue) => priceValue >= priceByType[fields.type.value],
-        () => `Не дешевле ${priceByType[fields.type.value]}`
+        formElement.price,
+        (priceValue) => priceValue >= priceByType[formElement.type.value],
+        () => `Не дешевле ${priceByType[formElement.type.value]}`
       );
 
-      fields.type.addEventListener('change', (event) => {
-        fields.price.min = fields.price.placeholder = priceByType[fields.type.value];
-        pristine.validate(fields.price, !event.isTrusted);
+      formElement.type.addEventListener('change', () => {
+        updateMinValue();
+        pristine.validate(formElement.price);
       });
 
-      fields.type.dispatchEvent(new Event('change'));
+      formElement.addEventListener('reset', () => {
+        requestAnimationFrame(updateMinValue);
+      });
+
+      updateMinValue();
+
+      function updateMinValue() {
+        formElement.price.min = formElement.price.placeholder = priceByType[formElement.type.value];
+      }
 
       return this;
     },
@@ -89,10 +89,10 @@ function createConstraints(form, options) {
      * @param {number} maxPrice
      */
     setPriceMaxValue(maxPrice) {
-      fields.price.max = maxPrice;
+      formElement.price.max = maxPrice;
 
       pristine.addValidator(
-        fields.price,
+        formElement.price,
         (priceValue) => priceValue <= maxPrice,
         `Не дороже ${maxPrice}`
       );
@@ -105,7 +105,7 @@ function createConstraints(form, options) {
      * @param {number} step
      */
     setPriceStep(step) {
-      fields.price.step = step;
+      formElement.price.step = step;
 
       return this;
     },
@@ -115,30 +115,30 @@ function createConstraints(form, options) {
      * числа гостей в зависимости от количества комнат.
      */
     setCapacity() {
-      const notForGuestsValue = [...fields.rooms.options].pop().value;
+      const notForGuestsValue = [...formElement.rooms.options].pop().value;
 
-      pristine.addValidator(fields.guests, (guestsValue) =>{
-        if (fields.rooms.value === notForGuestsValue) {
+      pristine.addValidator(formElement.guests, (guestsValue) =>{
+        if (formElement.rooms.value === notForGuestsValue) {
           return guestsValue === '0';
         }
         return true;
       }, 'Не для гостей', 1, true);
 
-      pristine.addValidator(fields.guests, (guestsValue) =>{
+      pristine.addValidator(formElement.guests, (guestsValue) =>{
         if (guestsValue === '0') {
-          return fields.rooms.value === notForGuestsValue;
+          return formElement.rooms.value === notForGuestsValue;
         }
         return true;
-      }, 'Не менее 1');
+      }, `Не менее ${formatGuests(1)}`);
 
       pristine.addValidator(
-        fields.guests,
-        (guestsValue) => guestsValue <= fields.rooms.value,
-        () => `Не более ${fields.rooms.value}`
+        formElement.guests,
+        (guestsValue) => guestsValue <= formElement.rooms.value,
+        () => `Не более ${formatGuests(formElement.rooms.value)}`
       );
 
-      fields.rooms.addEventListener('change', () => {
-        pristine.validate(fields.guests);
+      formElement.rooms.addEventListener('change', () => {
+        pristine.validate(formElement.guests);
       });
 
       return this;
@@ -148,7 +148,7 @@ function createConstraints(form, options) {
      * Переведет поле адреса в состояние "Только для чтения".
      */
     setAddressToReadOnly() {
-      fields.address.readOnly = true;
+      formElement.address.readOnly = true;
 
       return this;
     },
@@ -157,12 +157,12 @@ function createConstraints(form, options) {
      * Синхронизирует время заезда и выезда.
      */
     syncCheckHours() {
-      fields.checkin.addEventListener('change', () => {
-        fields.checkout.value = fields.checkin.value;
+      formElement.checkin.addEventListener('change', () => {
+        formElement.checkout.value = formElement.checkin.value;
       });
 
-      fields.checkout.addEventListener('change', () => {
-        fields.checkin.value = fields.checkout.value;
+      formElement.checkout.addEventListener('change', () => {
+        formElement.checkin.value = formElement.checkout.value;
       });
 
       return this;

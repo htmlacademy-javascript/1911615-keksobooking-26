@@ -1,64 +1,75 @@
-import generateAds from './ad-generator.js';
-import createConstraints from './ad-constraints.js';
 import renderMap from './map.js';
-import createCardNode from './ad-card.js';
-import {toggleFormDisabled} from './utilities.js';
-import createRangeSlider from'./range-slider.js';
+import initMapForm from './map-form.js';
+import initAdForm from './ad-form.js';
+import {getAds, postAd} from './gateway.js';
+import showMessage from './message.js';
 
-// Деактивация форм.
-
-const adForm = document.querySelector('.ad-form');
-
-toggleFormDisabled('ad-form', true);
-toggleFormDisabled('map__filters', true);
-
-// Ограничения на ввод данных.
-
-createConstraints(adForm, {
-  errorTextParent: 'ad-form__element',
-  errorTextClass: 'ad-form__error',
-})
-  .setTitleMinLength(30)
-  .setTitleMaxLength(100)
-  .setPriceMinValue({bungalow: 0, flat: 1000, hotel: 3000, house: 5000, palace: 10000})
-  .setPriceMaxValue(100000)
-  .setPriceStep(1000)
-  .setCapacity()
-  .setAddressToReadOnly()
-  .syncCheckHours();
-
-// Альтернативный способ указать цену.
-
-createRangeSlider(document.querySelector('.ad-form__slider'),{
-  inputElement: adForm.price,
-});
-
-// Карта и метки.
-
-const map = renderMap('map-canvas', {
+const map = renderMap({
   center: [35.681729, 139.753927],
+  zoom: 13
 });
 
-generateAds().forEach((ad) => {
-  map.addSecondaryPin(ad.location, createCardNode(ad));
-});
+const mapForm = initMapForm().setDisabled(true);
 
-// Запись координат главной метки в поле адреса.
+const adForm = initAdForm().setDisabled(true);
+
+map.whenReady(async () => {
+  try {
+    const ads = await getAds();
+    const replacePins = () => map.replacePins(ads);
+    mapForm.setDisabled(false).on('change', replacePins).fire('change');
+
+  } catch (exception) {
+    showMessage('error',`Ошибка: ${exception.status || exception.message}`);
+  }
+  adForm.setDisabled(false);
+  map.primaryPin.fire('move');
+});
 
 map.primaryPin.on('move', () => {
-  const {lat, lng} = map.primaryPin.getLatLng();
-  adForm.address.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
-});
-map.primaryPin.fire('move');
-
-adForm.addEventListener('reset', () => {
-  requestAnimationFrame(() => map.resetView());
+  adForm.setAddress(map.primaryPin.getLatLng());
 });
 
-// Активация форм.
+adForm.on('formdata', async (event) => {
+  adForm.setDisabled(true);
 
-map.tileLayer.on('load', () => {
-  toggleFormDisabled('ad-form', false);
-  toggleFormDisabled('map__filters', false);
+  try {
+    await postAd(event.formData);
+    adForm.reset();
+    showMessage('success');
+
+  } catch(response) {
+    showMessage('error');
+  }
+
+  adForm.setDisabled(false);
 });
+
+adForm.on('reset', () => {
+  requestAnimationFrame(() => map.reset());
+  mapForm.reset().fire('change');
+});
+
+
+// // Установка предпросмотра изображений
+// setDropZone(
+//   document.querySelector('.ad-form-header__drop-zone'),
+//   document.querySelector('#avatar')
+// );
+
+// setPhotosPreview(
+//   document.querySelector('#avatar'),
+//   document.querySelector('.ad-form-avatar')
+// );
+
+// setDropZone(
+//   document.querySelector('.ad-form__drop-zone'),
+//   document.querySelector('#images')
+// );
+
+// setPhotosPreview(
+//   document.querySelector('#images'),
+//   document.querySelector('.ad-form-photo')
+// );
+
 

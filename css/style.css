@@ -631,8 +631,8 @@ fieldset {
   border-radius: 8px;
 }
 
-.ad-form__submit:hover,
-.ad-form__submit:focus {
+.ad-form__submit:hover:enabled,
+.ad-form__submit:focus:enabled {
   border-color: #ff6d51;
 }
 
@@ -640,12 +640,16 @@ fieldset {
   outline: none;
 }
 
-.ad-form__submit:active {
+.ad-form__submit:active:enabled {
   outline: none;
 
   color: white;
   border-color: #ff6d51;
   background-color: #ff6d51;
+}
+
+.ad-form__submit:disabled{
+  opacity: 0.3;
 }
 
 .ad-form__reset {

@@ -1,9 +1,10 @@
+import createMapPopupElement from './map-popup.js';
+
 /**
- * Рисует карту и главную метку.
- * @param {string} containerId
- * @param {cityCentre} options
+ * Нарисует карту и главную метку.
+ * @param {Object} options Настройки Leaflet.
  */
-function renderMap(containerId, options) {
+function renderMap(options) {
   /**
    * Изображение главной метки.
    */
@@ -45,40 +46,48 @@ function renderMap(containerId, options) {
   /**
    * Карта.
    */
-  const map = L.map(containerId, {
+  const map = L.map('map-canvas', {
     layers: [tileLayer, primaryPin, secondaryPinGroup],
-    zoom: 13,
     attributionControl: false,
     scrollWheelZoom: false,
     ...options
   });
 
   return {
+    whenReady: map.whenReady.bind(map),
     primaryPin,
-    tileLayer,
 
     /**
-     * Добавит второстепенную метку.
-     * @param {Object} location
-     * @param {HTMLElement} popup
+     * Добавит метку объявления на карту.
+     * @param {Ad} ad
      */
-    addSecondaryPin(location, popup) {
-      const secondaryPin = L.marker(location, {
+    appendPin(ad) {
+      const pin = L.marker(ad.location, {
         icon: secondaryPinIcon
       });
-      secondaryPin.bindPopup(popup);
-      secondaryPinGroup.addLayer(secondaryPin);
+      pin.bindPopup(createMapPopupElement(ad));
+
+      secondaryPinGroup.addLayer(pin);
+    },
+
+    /**
+     * Обновит метки объявлений на карте.
+     * @param {Ad[]} ads
+     */
+    replacePins(ads) {
+      secondaryPinGroup.clearLayers();
+
+      ads.forEach(this.appendPin);
     },
 
     /**
      * Сбросит местоположение и масштаб до первоначальных значений.
      */
-    resetView() {
+    reset() {
       const {center, zoom} = map.options;
-      map.setView(center, zoom);
+      map.setView(center, zoom).closePopup();
       primaryPin.setLatLng(center);
-      secondaryPinGroup.eachLayer((pin) => pin.closePopup());
-    },
+    }
   };
 }
 

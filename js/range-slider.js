@@ -1,20 +1,23 @@
 import '../nouislider/nouislider.js';
 
 /**
- * Создаст ползунок на DOM-элементе `element` и синхронизирует его с `options.inputElement`
- * @param {HTMLElement} element
+ * Нарисует слайдер диапазона,синхронизируя с `<input type=number>`,
+ * указанном в `options.syncWith`
+ * @param {HTMLElement} targetElement
  * @param {Object} options
  */
-function createRangeSlider(element, options) {
-  const {inputElement} = options;
+function renderRangeSlider(targetElement, options) {
+  const sourceElement = options.syncWith;
 
-  const rangeSlider = noUiSlider.create(element, {
-    start: inputElement.value,
-    range: {
-      min: 0,
-      max: Number(inputElement.max),
-    },
-    step: Number(inputElement.step),
+  const range = {
+    min: 0,
+    max: Number(sourceElement.max),
+  };
+
+  const rangeSlider = noUiSlider.create(targetElement, {
+    start: sourceElement.value,
+    range,
+    step: Number(sourceElement.step),
     behaviour: 'snap',
     connect: 'lower',
     animate: false,
@@ -22,15 +25,17 @@ function createRangeSlider(element, options) {
   });
 
   rangeSlider.on('slide', (values) => {
-    inputElement.value = Number(...values);
-    inputElement.dispatchEvent(new Event('input'));
+    sourceElement.value = Number(...values);
+    sourceElement.dispatchEvent(new Event('input'));
   });
 
-  inputElement.addEventListener('input', () => {
-    rangeSlider.set(inputElement.value);
+  sourceElement.addEventListener('input', (event) => {
+    if (event.isTrusted) {
+      rangeSlider.set(sourceElement.value);
+    }
   });
 
   return rangeSlider;
 }
 
-export default createRangeSlider;
+export default renderRangeSlider;
