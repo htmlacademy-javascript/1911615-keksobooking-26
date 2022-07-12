@@ -59,53 +59,26 @@ export function getItemsFromArray(items) {
 }
 
 /**
- * Переключает активное состояние формы.
- * @param {string} className
+ * Заблокирует/разблокирует элементы формы.
+ * @param {HTMLFormElement} formElement
  * @param {boolean} isDisabled
  */
-export function toggleFormDisabled(className, isDisabled) {
-  const form = document.querySelector(`.${className}`);
-  form.classList.toggle(`${className}--disabled`, isDisabled);
-  [...form.elements].forEach((node) => (node.disabled = isDisabled));
+export function setFormDisabled(formElement, isDisabled) {
+  [...formElement].forEach((element) => (element.disabled = isDisabled));
+
+  return formElement;
 }
 
-
-export function toggleButtonDisabled(element, isDisabled) {
-  element.disabled = isDisabled;
-}
-
-export function showAlert(message) {
-  const alertContainer = document.createElement('div');
-  alertContainer.style.zIndex = '1000';
-  alertContainer.style.position = 'absolute';
-  alertContainer.style.left = 'calc((1vw - 1200px)';
-  alertContainer.style.top = '0';
-  alertContainer.style.right = 'calc((1vw - 1200px) - 750px)';
-  alertContainer.style.padding = '10px';
-  alertContainer.style.fontSize = '20px';
-  alertContainer.style.textAlign = 'center';
-  alertContainer.style.backgroundColor = '#f0f0ea';
-  alertContainer.style.width = '450px';
-  alertContainer.style.margin = '10px auto 0';
-  alertContainer.style.borderRadius = '5px';
-  alertContainer.style.boxShadow = '0 0 15px 5px #ccc';
-  alertContainer.style.borderLeft = '5px solid #80805b';
-
-  alertContainer.textContent = message;
-
-  document.body.append(alertContainer);
-
-  setTimeout(() => {
-    alertContainer.remove();
-  }, 5000);
-}
-
-export function debounce (callback, timeoutDelay = 500) {
-  let timeoutId;
-
+/**
+ * Ограничит частоту вызова `callback`
+ * @param {Function} callback
+ * @param {number} delay
+ */
+export function debounce(callback, delay = 500) {
+  let id;
   return (...rest) => {
-    clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+    clearTimeout(id);
+    id = setTimeout(() => callback(...rest), delay);
   };
 }
 
