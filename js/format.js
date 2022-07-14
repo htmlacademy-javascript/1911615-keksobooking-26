@@ -75,7 +75,7 @@ export function formatGuests(guests) {
  * @param {number} guests
  */
 export function formatCapacity(rooms, guests) {
-  return `${formatRooms(rooms)} для ${formatGuests(guests)}`;
+  return `${formatRooms(rooms)} ${guests === 0 ? 'не для гостей' :`для ${formatGuests(guests)}`}`;
 }
 
 /**
