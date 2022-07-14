@@ -1,3 +1,4 @@
+import initThumbnails from './ad-form-thumbnails.js';
 import createConstraints from './ad-form-constraints.js';
 import renderRangeSlider from './range-slider.js';
 import {setFormDisabled} from './utilities.js';
@@ -10,7 +11,7 @@ function initAdForm() {
   /**
    * Форма объявления.
    */
-  const formElement = document.querySelector('.ad-form');
+  const formElement = initThumbnails(document.querySelector('.ad-form'));
 
   /**
    * Ограничения на ввод данных.
