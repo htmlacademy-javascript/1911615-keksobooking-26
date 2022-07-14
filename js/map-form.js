@@ -1,3 +1,4 @@
+import './ad.js';
 import {setFormDisabled} from './utilities.js';
 
 /**
@@ -60,63 +61,51 @@ function initMapForm() {
 
     /**
      * Проверит соответствие стоимости жилья.
-     * @param {string} price
+     * @param {number} price
      */
     testPrice(price) {
       const {value} = mapFormElement['housing-price'];
 
-      if (value === 'any') {
-        return true;
-      } else if(value === 'high' && price >50000) {
-        return true;
-      } else if(value === 'middle' && price >=10000 && 50000 > price) {
-        return true;
+      if (value === 'low') {
+        return price < 10000;
       }
-      else if(value === 'low' && price <10000) {
-        return true;
+      if (value === 'middle') {
+        return price >= 10000 && price < 50000;
       }
-      return false;
+      if (value === 'high')  {
+        return price >= 50000;
+      }
+      return true;
     },
 
     /**
      * Проверит соответствие количества комнат.
-     * @param {string} rooms
+     * @param {number} rooms
      */
     testRooms(rooms) {
       const {value} = mapFormElement['housing-rooms'];
 
-      return value === 'any' || value === rooms.toString();
+      return value === 'any' || Number(value) === rooms;
     },
 
     /**
      * Проверит соответствие количества гостей.
-     * @param {string} guests
+     * @param {number} guests
      */
     testGuests(guests) {
       const {value} = mapFormElement['housing-guests'];
 
-      return value === 'any' || value === guests.toString();
+      return value === 'any' || Number(value) === guests;
     },
 
     /**
      * Проверит соответствие удобств.
-     * @param {string} features
+     * @param {string[]} features
      */
-    testFeatures(features) {
-      const selectedElements = mapFormElement['housing-features'].querySelectorAll('input:checked');
-      const checkedValues = Array.prototype.map.call(selectedElements,(callback)=> callback.value);
-      if (checkedValues.length) {
-        if(features === undefined){
-          return false;
-        }
-        for(let i=0; i<checkedValues.length; i++){
-          if(!features.includes(checkedValues[i])){
-            return false;
-          }
-        }
-        return true;
-      }
-      return true;
+    testFeatures(features = []) {
+      const checkedElements = mapFormElement.querySelectorAll('.map__checkbox:checked');
+
+      return [...checkedElements].every((element) => features.includes(element.value));
     },
 
     /**
@@ -125,14 +114,26 @@ function initMapForm() {
      * @param {number} limit
      */
     filter(ads, limit = 10) {
-      return ads.filter((ad) => this.testType(ad.offer.type))
-        .filter((ad) => this.testPrice(ad.offer.price))
-        .filter((ad) => this.testRooms(ad.offer.rooms))
-        .filter((ad) => this.testGuests(ad.offer.guests))
-        .filter((ad) => this.testFeatures(ad.offer.features))
-        .slice(0, limit);
+      const filteredAds =[];
+
+      ads.some((ad) => {
+        const hasMatch = this.testType(ad.offer.type)
+          && this.testPrice(ad.offer.price)
+          && this.testRooms(ad.offer.rooms)
+          && this.testGuests(ad.offer.guests)
+          && this.testFeatures(ad.offer.features);
+
+        if (hasMatch) {
+          filteredAds.push(ad);
+        }
+
+        return filteredAds.length === limit;
+      });
+
+      return filteredAds;
     }
   };
 }
 
 export default initMapForm;
+

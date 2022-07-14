@@ -4,6 +4,7 @@ import initAdForm from './ad-form.js';
 import {getAds, postAd} from './gateway.js';
 import showMessage from './message.js';
 import {debounce} from './utilities.js';
+import { setDropZone, setPhotosPreview } from './ad-form-photos.js';
 
 const map = renderMap({
   center: [35.681729, 139.753927],
@@ -52,25 +53,25 @@ adForm.on('reset', () => {
 });
 
 
-// // Установка предпросмотра изображений
-// setDropZone(
-//   document.querySelector('.ad-form-header__drop-zone'),
-//   document.querySelector('#avatar')
-// );
+// Установка предпросмотра изображений
+setDropZone(
+  document.querySelector('.ad-form-header__drop-zone'),
+  document.querySelector('#avatar')
+);
 
-// setPhotosPreview(
-//   document.querySelector('#avatar'),
-//   document.querySelector('.ad-form-avatar')
-// );
+setPhotosPreview(
+  document.querySelector('#avatar'),
+  document.querySelector('.ad-form-avatar')
+);
 
-// setDropZone(
-//   document.querySelector('.ad-form__drop-zone'),
-//   document.querySelector('#images')
-// );
+setDropZone(
+  document.querySelector('.ad-form__drop-zone'),
+  document.querySelector('#images')
+);
 
-// setPhotosPreview(
-//   document.querySelector('#images'),
-//   document.querySelector('.ad-form-photo')
-// );
+setPhotosPreview(
+  document.querySelector('#images'),
+  document.querySelector('.ad-form-photo')
+);
 
 
