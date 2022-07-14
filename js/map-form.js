@@ -9,7 +9,7 @@ function initMapForm() {
   /**
    * Форма объявления.
    */
-  const mapFormElement = document.querySelector('.map__filters');
+  const formElement = document.querySelector('.map__filters');
 
   return {
     /**
@@ -17,7 +17,7 @@ function initMapForm() {
      * @param {boolean} flag
      */
     setDisabled(flag) {
-      setFormDisabled(mapFormElement, flag).classList.toggle('.map__filters--disabled', flag);
+      setFormDisabled(formElement, flag).classList.toggle('.map__filters--disabled', flag);
 
       return this;
     },
@@ -26,7 +26,7 @@ function initMapForm() {
      * Добавит обработчик события.
      */
     on() {
-      mapFormElement.addEventListener(...arguments);
+      formElement.addEventListener(...arguments);
 
       return this;
     },
@@ -35,7 +35,7 @@ function initMapForm() {
      * Сбросит форму до значения по умолчанию.
      */
     reset() {
-      mapFormElement.reset();
+      formElement.reset();
 
       return this;
     },
@@ -44,7 +44,7 @@ function initMapForm() {
      * Сбросит форму до значения по умолчанию.
      */
     fire(name) {
-      mapFormElement.dispatchEvent(new Event(name));
+      formElement.dispatchEvent(new Event(name));
 
       return this;
     },
@@ -54,7 +54,7 @@ function initMapForm() {
      * @param {string} type
      */
     testType(type) {
-      const {value} = mapFormElement['housing-type'];
+      const {value} = formElement['housing-type'];
 
       return value === 'any' || value === type;
     },
@@ -64,7 +64,7 @@ function initMapForm() {
      * @param {number} price
      */
     testPrice(price) {
-      const {value} = mapFormElement['housing-price'];
+      const {value} = formElement['housing-price'];
 
       if (value === 'low') {
         return price < 10000;
@@ -83,7 +83,7 @@ function initMapForm() {
      * @param {number} rooms
      */
     testRooms(rooms) {
-      const {value} = mapFormElement['housing-rooms'];
+      const {value} = formElement['housing-rooms'];
 
       return value === 'any' || Number(value) === rooms;
     },
@@ -93,7 +93,7 @@ function initMapForm() {
      * @param {number} guests
      */
     testGuests(guests) {
-      const {value} = mapFormElement['housing-guests'];
+      const {value} = formElement['housing-guests'];
 
       return value === 'any' || Number(value) === guests;
     },
@@ -103,13 +103,13 @@ function initMapForm() {
      * @param {string[]} features
      */
     testFeatures(features = []) {
-      const checkedElements = mapFormElement.querySelectorAll('.map__checkbox:checked');
+      const checkedElements = formElement.querySelectorAll('.map__checkbox:checked');
 
       return [...checkedElements].every((element) => features.includes(element.value));
     },
 
     /**
-     * Вернет объявления которые соответствуют текущим критериям.
+     * Вернет объявления, которые соответствуют текущим критериям.
      * @param {Ad[]} ads
      * @param {number} limit
      */

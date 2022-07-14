@@ -33,8 +33,6 @@ function showMessage(type, message) {
   document.addEventListener('keydown', handleKeydown);
 
   document.body.append(element);
-
-  return element;
 }
 
 export default showMessage;

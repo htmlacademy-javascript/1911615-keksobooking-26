@@ -18,8 +18,9 @@ function createConstraints(formElement, options) {
     if (!pristine.validate()) {
       const [invalid] = pristine.getErrors();
       invalid.input.focus();
+
     } else {
-      // Триггер события "formdata".
+      // Триггер события "formdata"
       new FormData(formElement);
     }
   });

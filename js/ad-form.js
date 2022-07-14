@@ -10,12 +10,12 @@ function initAdForm() {
   /**
    * Форма объявления.
    */
-  const adFormElement = document.querySelector('.ad-form');
+  const formElement = document.querySelector('.ad-form');
 
   /**
    * Ограничения на ввод данных.
    */
-  createConstraints(adFormElement, {
+  createConstraints(formElement, {
     classTo: 'ad-form__element',
     errorTextParent: 'ad-form__element',
     errorTextClass: 'ad-form__error'
@@ -32,12 +32,12 @@ function initAdForm() {
   /**
    * Слайдер диапазона для поля цены.
    */
-  const priceRangeSlider = renderRangeSlider(document.querySelector('.ad-form__slider'),{
-    syncWith: adFormElement.price,
+  const priceSlider = renderRangeSlider(document.querySelector('.ad-form__slider'),{
+    syncWith: formElement.price,
   });
 
-  adFormElement.addEventListener('reset', () => {
-    priceRangeSlider.reset();
+  formElement.addEventListener('reset', () => {
+    priceSlider.reset();
   });
 
   return {
@@ -46,10 +46,10 @@ function initAdForm() {
      * @param {boolean} flag
      */
     setDisabled(flag) {
-      setFormDisabled(adFormElement, flag).classList.toggle('ad-form--disabled', flag);
+      setFormDisabled(formElement, flag).classList.toggle('ad-form--disabled', flag);
 
-      priceRangeSlider.target.toggleAttribute('disabled', flag);
-      priceRangeSlider.target.querySelector('[tabindex]').tabIndex = flag ? -1 : 0;
+      priceSlider.target.toggleAttribute('disabled', flag);
+      priceSlider.target.querySelector('[tabindex]').tabIndex = flag ? -1 : 0;
 
       return this;
     },
@@ -58,7 +58,7 @@ function initAdForm() {
      * Добавит обработчик события.
      */
     on() {
-      adFormElement.addEventListener(...arguments);
+      formElement.addEventListener(...arguments);
 
       return this;
     },
@@ -67,7 +67,7 @@ function initAdForm() {
      * Сбросит форму до значения по умолчанию.
      */
     reset() {
-      adFormElement.reset();
+      formElement.reset();
 
       return this;
     },
@@ -77,7 +77,7 @@ function initAdForm() {
      * @param {AdLocation} location
      */
     setAddress({lat, lng}) {
-      adFormElement.address.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+      formElement.address.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
 
       return this;
     }
