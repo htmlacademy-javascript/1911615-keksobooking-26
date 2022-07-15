@@ -15,10 +15,18 @@ export function setFormDisabled(formElement, isDisabled) {
  * @param {number} delay
  */
 export function debounce(callback, delay = 500) {
-  let id;
+  let timeoutId;
+  let lastCallTime = Date.now();
+
   return (...rest) => {
-    clearTimeout(id);
-    id = setTimeout(() => callback(...rest), delay);
+    const elapsedSinceLastCall = Date.now() - lastCallTime;
+    const remainingDelay = delay - Math.min(delay, elapsedSinceLastCall);
+
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      callback(...rest);
+      lastCallTime = Date.now();
+    }, remainingDelay);
   };
 }
 
