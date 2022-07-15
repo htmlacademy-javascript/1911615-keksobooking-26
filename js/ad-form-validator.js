@@ -5,11 +5,11 @@ Pristine.addMessages('ru', {required: 'Обязательное поле'});
 Pristine.setLocale('ru');
 
 /**
- * Вернет методы установки ограничений для формы размещения объявления.
- * @param {HTMLFormElement} formElement Форма размещения объявления.
+ * Вернет методы установки ограничений для формы объявления.
+ * @param {HTMLFormElement} formElement Форма объявления.
  * @param {Object} options Настройки Pristine.
  */
-function createConstraints(formElement, options) {
+function createValidator(formElement, options) {
   const pristine = new Pristine(formElement, options);
 
   formElement.addEventListener('submit', (event) => {
@@ -171,4 +171,4 @@ function createConstraints(formElement, options) {
   };
 }
 
-export default createConstraints;
+export default createValidator;

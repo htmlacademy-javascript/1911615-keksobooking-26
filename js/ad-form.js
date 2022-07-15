@@ -1,5 +1,5 @@
 import initThumbnails from './ad-form-thumbnails.js';
-import createConstraints from './ad-form-constraints.js';
+import createValidator from './ad-form-validator.js';
 import renderRangeSlider from './range-slider.js';
 import {setFormDisabled} from './utilities.js';
 
@@ -10,13 +10,14 @@ import {setFormDisabled} from './utilities.js';
 function initAdForm() {
   /**
    * Форма объявления.
+   * @type {HTMLFormElement}
    */
   const formElement = initThumbnails(document.querySelector('.ad-form'));
 
   /**
    * Ограничения на ввод данных.
    */
-  createConstraints(formElement, {
+  createValidator(formElement, {
     classTo: 'ad-form__element',
     errorTextParent: 'ad-form__element',
     errorTextClass: 'ad-form__error'

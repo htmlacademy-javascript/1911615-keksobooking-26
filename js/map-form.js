@@ -1,4 +1,5 @@
 import './ad.js';
+import createMatcher from './map-form-matcher.js';
 import {setFormDisabled} from './utilities.js';
 
 /**
@@ -7,13 +8,19 @@ import {setFormDisabled} from './utilities.js';
  */
 function initMapForm() {
   /**
-   * Форма объявления.
+   * Форма фильтрации.
+   * @type {HTMLFormElement}
    */
   const formElement = document.querySelector('.map__filters');
 
+  /**
+   * Методы проверки совпадений.
+   */
+  const $ = createMatcher(formElement);
+
   return {
     /**
-     * Заблокирует/разблокирует форму
+     * Заблокирует/разблокирует форму.
      * @param {boolean} flag
      */
     setDisabled(flag) {
@@ -50,65 +57,6 @@ function initMapForm() {
     },
 
     /**
-     * Проверит соответствие вида жилья.
-     * @param {string} type
-     */
-    testType(type) {
-      const {value} = formElement['housing-type'];
-
-      return value === 'any' || value === type;
-    },
-
-    /**
-     * Проверит соответствие стоимости жилья.
-     * @param {number} price
-     */
-    testPrice(price) {
-      const {value} = formElement['housing-price'];
-
-      if (value === 'low') {
-        return price < 10000;
-      }
-      if (value === 'middle') {
-        return price >= 10000 && price < 50000;
-      }
-      if (value === 'high')  {
-        return price >= 50000;
-      }
-      return true;
-    },
-
-    /**
-     * Проверит соответствие количества комнат.
-     * @param {number} rooms
-     */
-    testRooms(rooms) {
-      const {value} = formElement['housing-rooms'];
-
-      return value === 'any' || Number(value) === rooms;
-    },
-
-    /**
-     * Проверит соответствие количества гостей.
-     * @param {number} guests
-     */
-    testGuests(guests) {
-      const {value} = formElement['housing-guests'];
-
-      return value === 'any' || Number(value) === guests;
-    },
-
-    /**
-     * Проверит соответствие удобств.
-     * @param {string[]} features
-     */
-    testFeatures(features = []) {
-      const checkedElements = formElement.querySelectorAll('.map__checkbox:checked');
-
-      return [...checkedElements].every((element) => features.includes(element.value));
-    },
-
-    /**
      * Вернет объявления, которые соответствуют текущим критериям.
      * @param {Ad[]} ads
      * @param {number} limit
@@ -117,11 +65,11 @@ function initMapForm() {
       const filteredAds =[];
 
       ads.some((ad) => {
-        const hasMatch = this.testType(ad.offer.type)
-          && this.testPrice(ad.offer.price)
-          && this.testRooms(ad.offer.rooms)
-          && this.testGuests(ad.offer.guests)
-          && this.testFeatures(ad.offer.features);
+        const hasMatch = $.testType(ad.offer.type)
+          && $.testPrice(ad.offer.price)
+          && $.testRooms(ad.offer.rooms)
+          && $.testGuests(ad.offer.guests)
+          && $.testFeatures(ad.offer.features);
 
         if (hasMatch) {
           filteredAds.push(ad);
