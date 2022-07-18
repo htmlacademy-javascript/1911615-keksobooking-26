@@ -1,7 +1,7 @@
 import '../nouislider/nouislider.js';
 
 /**
- * Нарисует слайдер диапазона,синхронизируя с `<input type=number>`,
+ * Нарисует слайдер диапазона, синхронизируя с числовым полем,
  * указанном в `options.syncWith`
  * @param {HTMLElement} targetElement
  * @param {Object} options

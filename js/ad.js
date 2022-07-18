@@ -1,5 +1,5 @@
 /**
- * Объявление
+ * Объявление.
  * @typedef Ad
  * @prop {AdAuthor} author
  * @prop {AdOffer} offer
@@ -7,20 +7,20 @@
  */
 
 /**
- * Автор объявления
+ * Автор объявления.
  * @typedef AdAuthor
  * @prop {string} avatar URL-адрес аватарки
  */
 
 /**
- * Местоположение объявления
+ * Местоположение (географические координаты).
  * @typedef AdLocation
  * @prop {number} lat Широта
  * @prop {number} lng Долгота
  */
 
 /**
- * Детали объявления
+ * Детали объявления.
  * @typedef AdOffer
  * @prop {string} title Заголовок
  * @prop {string} address Адрес жилья
@@ -30,9 +30,9 @@
  * @prop {number} guests Количество гостей
  * @prop {string} checkin Время заезда `HH:MM`
  * @prop {string} checkout Время выезда `HH:MM`
- * @prop {string[]} features Список удобств, может содержать: `wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`.
+ * @prop {string[]} features Удобства, могут включать: `wifi`, `dishwasher`, `parking`, `washer`, `elevator`, `conditioner`
  * @prop {string} description Описание жилья
- * @prop {string[]} photos Фотографии в виде URL-адресов
+ * @prop {string[]} photos URL-адреса фотографий
  */
 
 

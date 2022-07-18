@@ -9,7 +9,7 @@ function handleKeydown(event) {
 }
 
 /**
- * Спрячет сообщение по клику в любой области.
+ * Спрячет сообщение при нажатии на любую его область.
  * @param {MouseEvent} event
  */
 function handleMessageClick(event) {
@@ -19,7 +19,7 @@ function handleMessageClick(event) {
 
 /**
  * Покажет сообщение.
- * @param {string} type Вид, один из: `success`, `error`.
+ * @param {string} type Один из: `success`, `error`.
  * @param {string} message Текст сообщения.
  */
 function showMessage(type, message) {
@@ -29,6 +29,7 @@ function showMessage(type, message) {
   if (message) {
     element.querySelector('p').textContent = message;
   }
+
   element.addEventListener('click', handleMessageClick);
   document.addEventListener('keydown', handleKeydown);
 

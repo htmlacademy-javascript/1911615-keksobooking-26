@@ -4,8 +4,8 @@
 const BASE_URL = 'https://26.javascript.pages.academy/keksobooking';
 
 /**
- * Отправит запрос на сервер
- * @param {string} path Относительный путь запроса
+ * Отправит запрос на сервер.
+ * @param {string} path
  * @param {Object} options
  */
 function request(path, options) {
@@ -18,23 +18,23 @@ function request(path, options) {
 }
 
 /**
- * Получит список объявлений
+ * Получит список объявлений.
  * @returns {Promise<Ad[]>}
  */
 export function getAds() {
   return request('/data', {
     method: 'get',
-    cache: 'force-cache'
+    cache: 'no-cache'
   });
 }
 
 /**
- * Передаст объявление
+ * Отправит данные объявления.
  * @param {FormData} data
  */
 export function postAd(data) {
   return request('/', {
-    method: 'POST',
+    method: 'post',
     body: data
   });
 }

@@ -39,7 +39,7 @@ function initMapForm() {
     },
 
     /**
-     * Сбросит форму до значения по умолчанию.
+     * Сбросит поля формы до первоначальных значений.
      */
     reset() {
       formElement.reset();
@@ -48,7 +48,8 @@ function initMapForm() {
     },
 
     /**
-     * Сбросит форму до значения по умолчанию.
+     * Отправит событие.
+     * @param {string} name
      */
     fire(name) {
       formElement.dispatchEvent(new Event(name));
@@ -57,19 +58,20 @@ function initMapForm() {
     },
 
     /**
-     * Вернет объявления, которые соответствуют текущим критериям.
+     * Вернет объявления, которые подходят по всем критериям,
+     * ограничивая список параметром `limit`.
      * @param {Ad[]} ads
      * @param {number} limit
      */
     filter(ads, limit = 10) {
-      const filteredAds =[];
+      const filteredAds = [];
 
       ads.some((ad) => {
-        const hasMatch = $.testType(ad.offer.type)
-          && $.testPrice(ad.offer.price)
-          && $.testRooms(ad.offer.rooms)
-          && $.testGuests(ad.offer.guests)
-          && $.testFeatures(ad.offer.features);
+        const hasMatch = $.matchType(ad.offer.type)
+          && $.matchPrice(ad.offer.price)
+          && $.matchRooms(ad.offer.rooms)
+          && $.matchGuests(ad.offer.guests)
+          && $.matchFeatures(ad.offer.features);
 
         if (hasMatch) {
           filteredAds.push(ad);

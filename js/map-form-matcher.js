@@ -1,17 +1,17 @@
 import {clamp} from './utilities.js';
 
+/**
+ * Значение не заданного критерия.
+ */
 const ANY = 'any';
-const LOW = 'low';
-const MIDDLE = 'middle';
-const HIGH = 'high';
 
 /**
  * Словарь ценовых диапазонов.
  */
-const priceRangeByType = {
-  [LOW]: [0, 9999],
-  [MIDDLE]: [10000, 49999],
-  [HIGH]: [50000, Infinity]
+const priceRangeByLevel = {
+  low: [0, 9999],
+  middle: [10000, 49999],
+  high: [50000, Infinity]
 };
 
 /**
@@ -24,7 +24,7 @@ function createMatcher(formElement) {
      * Проверит соответствие вида жилья.
      * @param {string} type
      */
-    testType(type) {
+    matchType(type) {
       const {value} = formElement['housing-type'];
 
       return value === ANY || value === type;
@@ -34,17 +34,17 @@ function createMatcher(formElement) {
      * Проверит соответствие стоимости жилья.
      * @param {number} price
      */
-    testPrice(price) {
+    matchPrice(price) {
       const {value} = formElement['housing-price'];
 
-      return value === ANY || price === clamp(price, ...priceRangeByType[value]);
+      return value === ANY || clamp(price, ...priceRangeByLevel[value]) === price;
     },
 
     /**
      * Проверит соответствие количества комнат.
      * @param {number} rooms
      */
-    testRooms(rooms) {
+    matchRooms(rooms) {
       const {value} = formElement['housing-rooms'];
 
       return value === ANY || Number(value) === rooms;
@@ -54,7 +54,7 @@ function createMatcher(formElement) {
      * Проверит соответствие количества гостей.
      * @param {number} guests
      */
-    testGuests(guests) {
+    matchGuests(guests) {
       const {value} = formElement['housing-guests'];
 
       return value === ANY || Number(value) === guests;
@@ -64,7 +64,7 @@ function createMatcher(formElement) {
      * Проверит соответствие удобств.
      * @param {string[]} features
      */
-    testFeatures(features = []) {
+    matchFeatures(features = []) {
       const checkedElements = formElement['housing-features'].querySelectorAll(':checked');
 
       return [...checkedElements].every((element) => features.includes(element.value));

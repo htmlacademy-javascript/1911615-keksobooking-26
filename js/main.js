@@ -41,7 +41,7 @@ adForm.on('formdata', async (event) => {
     adForm.reset();
     showMessage('success');
 
-  } catch(response) {
+  } catch (exception) {
     showMessage('error');
   }
 

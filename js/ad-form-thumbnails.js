@@ -1,5 +1,5 @@
 /**
- * Инициализирует показ загружаемых изображений в виде миниатюр.
+ * Инициализирует показ выбранных файлов в виде миниатюр.
  * @param {HTMLFormElement} formElement
  */
 function initThumbnails(formElement) {
@@ -42,17 +42,17 @@ function initThumbnails(formElement) {
     });
   }
 
-  // Выбор аватара
+  // Реакция на выбор аватара
   formElement.avatar.addEventListener('change', (event) => {
     updateAuthorAvatar(URL.createObjectURL(...event.target.files));
   });
 
-  // Выбор фотографии жилья
+  // Реакция на выбор фотографии жилья
   formElement.images.addEventListener('change', (event) => {
     updateOfferPhoto(`url(${URL.createObjectURL(...event.target.files)})`);
   });
 
-  // Возврат в исходное состояние
+  // Реакция на сброс формы
   formElement.addEventListener('reset', () => {
     updateAuthorAvatar(DEFAULT_AVATAR_URL);
     updateOfferPhoto(null);
