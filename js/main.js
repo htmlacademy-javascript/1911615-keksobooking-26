@@ -4,7 +4,6 @@ import initAdForm from './ad-form.js';
 import {getAds, postAd} from './gateway.js';
 import showMessage from './message.js';
 import {debounce} from './utilities.js';
-import { setDropZone, setPhotosPreview } from './ad-form-photos.js';
 
 const map = renderMap({
   center: [35.681729, 139.753927],
@@ -19,11 +18,13 @@ map.whenReady(async () => {
   try {
     const ads = await getAds();
     const replacePins = debounce(() => map.replacePins(mapForm.filter(ads)));
+
     mapForm.setDisabled(false).on('change', replacePins).fire('change');
 
   } catch (exception) {
     showMessage('error',`Ошибка: ${exception.status || exception.message}`);
   }
+
   adForm.setDisabled(false);
   map.primaryPin.fire('move');
 });
@@ -38,9 +39,10 @@ adForm.on('formdata', async (event) => {
   try {
     await postAd(event.formData);
     adForm.reset();
+    scroll(0, 0);
     showMessage('success');
 
-  } catch(response) {
+  } catch (exception) {
     showMessage('error');
   }
 
@@ -51,27 +53,4 @@ adForm.on('reset', () => {
   requestAnimationFrame(() => map.reset());
   mapForm.reset().fire('change');
 });
-
-
-// Установка предпросмотра изображений
-setDropZone(
-  document.querySelector('.ad-form-header__drop-zone'),
-  document.querySelector('#avatar')
-);
-
-setPhotosPreview(
-  document.querySelector('#avatar'),
-  document.querySelector('.ad-form-avatar')
-);
-
-setDropZone(
-  document.querySelector('.ad-form__drop-zone'),
-  document.querySelector('#images')
-);
-
-setPhotosPreview(
-  document.querySelector('#images'),
-  document.querySelector('.ad-form-photo')
-);
-
 

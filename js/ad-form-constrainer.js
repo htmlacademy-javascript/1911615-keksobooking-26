@@ -5,11 +5,11 @@ Pristine.addMessages('ru', {required: 'Обязательное поле'});
 Pristine.setLocale('ru');
 
 /**
- * Вернет методы установки ограничений для формы размещения объявления.
- * @param {HTMLFormElement} formElement Форма размещения объявления.
+ * Вернет методы установки ограничений для формы объявления.
+ * @param {HTMLFormElement} formElement Форма объявления.
  * @param {Object} options Настройки Pristine.
  */
-function createConstraints(formElement, options) {
+function createConstrainer(formElement, options) {
   const pristine = new Pristine(formElement, options);
 
   formElement.addEventListener('submit', (event) => {
@@ -35,13 +35,11 @@ function createConstraints(formElement, options) {
      * @param {number} minLength
      */
     setTitleMinLength(minLength) {
-      formElement.title.minLength = minLength;
+      const message = `Не менее ${minLength} символов`;
+      const isValid = (value) => value.replace(/\s+/g, '').length >= minLength;
 
-      pristine.addValidator(
-        formElement.title,
-        (titleValue) => titleValue.replace(/\s+/g, '').length >= minLength,
-        `Не менее ${minLength} символов`
-      );
+      pristine.addValidator(formElement.title, isValid, message);
+      formElement.title.minLength = minLength;
 
       return this;
     },
@@ -61,11 +59,17 @@ function createConstraints(formElement, options) {
      * @param {Object<string, number>} priceByType
      */
     setPriceMinValue(priceByType) {
-      pristine.addValidator(
-        formElement.price,
-        (priceValue) => priceValue >= priceByType[formElement.type.value],
-        () => `Не дешевле ${priceByType[formElement.type.value]}`
-      );
+      const getMessage = () => `Не дешевле ${priceByType[formElement.type.value]}`;
+      const isValid = (value) => value >= priceByType[formElement.type.value];
+
+      pristine.addValidator(formElement.price, isValid, getMessage);
+
+      const updateMinValue = () => {
+        const value = priceByType[formElement.type.value];
+        formElement.price.min = formElement.price.placeholder = value;
+      };
+
+      updateMinValue();
 
       formElement.type.addEventListener('change', () => {
         updateMinValue();
@@ -76,12 +80,6 @@ function createConstraints(formElement, options) {
         requestAnimationFrame(updateMinValue);
       });
 
-      updateMinValue();
-
-      function updateMinValue() {
-        formElement.price.min = formElement.price.placeholder = priceByType[formElement.type.value];
-      }
-
       return this;
     },
 
@@ -90,13 +88,11 @@ function createConstraints(formElement, options) {
      * @param {number} maxPrice
      */
     setPriceMaxValue(maxPrice) {
-      formElement.price.max = maxPrice;
+      const message = `Не дороже ${maxPrice}`;
+      const isValid = (value) => value <= maxPrice;
 
-      pristine.addValidator(
-        formElement.price,
-        (priceValue) => priceValue <= maxPrice,
-        `Не дороже ${maxPrice}`
-      );
+      pristine.addValidator(formElement.price, isValid, message);
+      formElement.price.max = maxPrice;
 
       return this;
     },
@@ -114,27 +110,27 @@ function createConstraints(formElement, options) {
     /**
      * Установит ограничение минимального и максимального
      * числа гостей в зависимости от количества комнат.
+     * @param {Object} options
      */
-    setCapacity() {
-      const notForGuestsValue = [...formElement.rooms.options].pop().value;
+    setCapacity({roomsNotForGuests = '100'} = {}) {
 
-      pristine.addValidator(formElement.guests, (guestsValue) =>{
-        if (formElement.rooms.value === notForGuestsValue) {
-          return guestsValue === '0';
+      pristine.addValidator(formElement.guests, (value) => {
+        if (formElement.rooms.value === roomsNotForGuests) {
+          return value === '0';
         }
         return true;
       }, 'Не для гостей', 1, true);
 
-      pristine.addValidator(formElement.guests, (guestsValue) =>{
-        if (guestsValue === '0') {
-          return formElement.rooms.value === notForGuestsValue;
+      pristine.addValidator(formElement.guests, (value) => {
+        if (value === '0') {
+          return formElement.rooms.value === roomsNotForGuests;
         }
         return true;
       }, `Не менее ${formatGuests(1)}`);
 
       pristine.addValidator(
         formElement.guests,
-        (guestsValue) => guestsValue <= formElement.rooms.value,
+        (value) => value <= formElement.rooms.value,
         () => `Не более ${formatGuests(formElement.rooms.value)}`
       );
 
@@ -171,4 +167,4 @@ function createConstraints(formElement, options) {
   };
 }
 
-export default createConstraints;
+export default createConstrainer;

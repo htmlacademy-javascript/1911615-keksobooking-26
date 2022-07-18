@@ -1,7 +1,7 @@
 /**
  * Правила множественности.
  */
-const pluralRules = new Intl.PluralRules('ru');
+const pluralRuleSelector = new Intl.PluralRules('ru');
 
 /**
  * Формат чисел.
@@ -58,7 +58,7 @@ export function formatPrice(price) {
  * @param {number} rooms
  */
 export function formatRooms(rooms) {
-  return `${rooms} ${roomsUnitByRule[pluralRules.select(rooms)]}`;
+  return `${rooms} ${roomsUnitByRule[pluralRuleSelector.select(rooms)]}`;
 }
 
 /**
@@ -66,7 +66,7 @@ export function formatRooms(rooms) {
  * @param {number} guests
  */
 export function formatGuests(guests) {
-  return `${guests} ${guestsUnitByRule[pluralRules.select(guests)]}`;
+  return `${guests} ${guestsUnitByRule[pluralRuleSelector.select(guests)]}`;
 }
 
 /**
@@ -76,7 +76,7 @@ export function formatGuests(guests) {
  */
 export function formatCapacity(rooms, guests) {
   if (guests) {
-    return  `${formatRooms(rooms)} для ${formatGuests(guests)}`;
+    return `${formatRooms(rooms)} для ${formatGuests(guests)}`;
   }
   return formatRooms(rooms);
 }

@@ -1,7 +1,7 @@
-import createMapPopupElement from './map-popup.js';
+import createPopupElement from './map-popup.js';
 
 /**
- * Нарисует карту и главную метку.
+ * Нарисует карту, главную метку и вернет методы для дальнейшего взаимодействия.
  * @param {Object} options Настройки Leaflet.
  */
 function renderMap(options) {
@@ -65,13 +65,13 @@ function renderMap(options) {
       const pin = L.marker(ad.location, {
         icon: secondaryPinIcon
       });
-      pin.bindPopup(createMapPopupElement(ad));
+      pin.bindPopup(createPopupElement(ad));
 
       secondaryPinGroup.addLayer(pin);
     },
 
     /**
-     * Обновит метки объявлений на карте.
+     * Заменит существующие метки объявлений на карте.
      * @param {Ad[]} ads
      */
     replacePins(ads) {
@@ -81,7 +81,7 @@ function renderMap(options) {
     },
 
     /**
-     * Сбросит местоположение и масштаб до первоначальных значений.
+     * Вернет местоположение и масштаб в исходное состояние.
      */
     reset() {
       const {center, zoom} = map.options;

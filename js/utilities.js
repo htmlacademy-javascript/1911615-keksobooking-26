@@ -10,15 +10,31 @@ export function setFormDisabled(formElement, isDisabled) {
 }
 
 /**
- * Ограничит частоту вызова `callback`
+ * Ограничит частоту вызова `callback`.
  * @param {Function} callback
- * @param {number} delay
+ * @param {number} interval
  */
-export function debounce(callback, delay = 500) {
-  let id;
+export function debounce(callback, interval = 500) {
+  let timeoutId = null;
+  let lastCallTime = null;
+
   return (...rest) => {
-    clearTimeout(id);
-    id = setTimeout(() => callback(...rest), delay);
+    clearTimeout(timeoutId);
+
+    timeoutId = setTimeout(() => {
+      callback(...rest);
+      lastCallTime = Date.now();
+
+    }, interval - Math.min(interval, Date.now() - lastCallTime));
   };
 }
 
+/**
+ * Ограничит `value` диапазоном `min` - `max`.
+ * @param {number} value
+ * @param {number} min
+ * @param {number} max
+ */
+export function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
