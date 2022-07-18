@@ -39,6 +39,7 @@ adForm.on('formdata', async (event) => {
   try {
     await postAd(event.formData);
     adForm.reset();
+    scroll(0, 0);
     showMessage('success');
 
   } catch (exception) {
