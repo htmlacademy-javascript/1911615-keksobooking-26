@@ -9,7 +9,7 @@ Pristine.setLocale('ru');
  * @param {HTMLFormElement} formElement Форма объявления.
  * @param {Object} options Настройки Pristine.
  */
-function createValidator(formElement, options) {
+function createConstrainer(formElement, options) {
   const pristine = new Pristine(formElement, options);
 
   formElement.addEventListener('submit', (event) => {
@@ -171,4 +171,4 @@ function createValidator(formElement, options) {
   };
 }
 
-export default createValidator;
+export default createConstrainer;

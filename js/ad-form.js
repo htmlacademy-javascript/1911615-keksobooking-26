@@ -1,5 +1,5 @@
 import initThumbnails from './ad-form-thumbnails.js';
-import createValidator from './ad-form-validator.js';
+import createConstrainer from './ad-form-constrainer.js';
 import renderRangeSlider from './range-slider.js';
 import {setFormDisabled} from './utilities.js';
 
@@ -17,7 +17,7 @@ function initAdForm() {
   /**
    * Ограничения на ввод данных.
    */
-  createValidator(formElement, {
+  createConstrainer(formElement, {
     classTo: 'ad-form__element',
     errorTextParent: 'ad-form__element',
     errorTextClass: 'ad-form__error'
