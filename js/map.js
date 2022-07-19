@@ -21,7 +21,7 @@ function renderMap(options) {
     icon: primaryPinIcon,
     draggable: true,
     autoPan: true,
-    zIndexOffset: 1000,
+    zIndexOffset: 1000
   });
 
   /**
@@ -56,6 +56,9 @@ function renderMap(options) {
   return {
     whenReady: map.whenReady.bind(map),
     primaryPin,
+    primaryPinIcon,
+    secondaryPinIcon,
+    tileLayer,
 
     /**
      * Добавит метку объявления на карту.
