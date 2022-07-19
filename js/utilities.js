@@ -4,7 +4,9 @@
  * @param {boolean} isDisabled
  */
 export function setFormDisabled(formElement, isDisabled) {
-  [...formElement].forEach((element) => (element.disabled = isDisabled));
+  [...formElement].forEach((element) => {
+    element.disabled = isDisabled;
+  });
 
   return formElement;
 }

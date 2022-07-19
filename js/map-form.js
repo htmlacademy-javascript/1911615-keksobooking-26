@@ -16,7 +16,13 @@ function initMapForm() {
   /**
    * Методы проверки совпадений.
    */
-  const $ = createMatcher(formElement);
+  const {
+    matchType,
+    matchPrice,
+    matchRooms,
+    matchGuests,
+    matchFeatures
+  } = createMatcher(formElement);
 
   return {
     /**
@@ -67,11 +73,11 @@ function initMapForm() {
       const filteredAds = [];
 
       ads.some((ad) => {
-        const hasMatch = $.matchType(ad.offer.type)
-          && $.matchPrice(ad.offer.price)
-          && $.matchRooms(ad.offer.rooms)
-          && $.matchGuests(ad.offer.guests)
-          && $.matchFeatures(ad.offer.features);
+        const hasMatch = matchType(ad.offer.type)
+          && matchPrice(ad.offer.price)
+          && matchRooms(ad.offer.rooms)
+          && matchGuests(ad.offer.guests)
+          && matchFeatures(ad.offer.features);
 
         if (hasMatch) {
           filteredAds.push(ad);
